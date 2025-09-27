@@ -1,0 +1,18 @@
+{
+  "name": "crypto-flow-monorepo",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "npm run --workspace=client dev",
+    "build": "npm run --workspace=client build",
+    "lint": "npm run --workspaces lint",
+    "type-check": "npm run --workspaces type-check"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.3"
+  }
+}
