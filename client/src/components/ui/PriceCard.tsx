@@ -53,7 +53,9 @@ export const PriceCard: React.FC<PriceCardProps> = ({
             className="h-8 w-8 rounded-full"
           />
           <div>
-            <h3 className="font-semibold text-sm text-foreground">{crypto.name}</h3>
+            <h3 className="font-semibold text-sm text-foreground">
+              {crypto.name}
+            </h3>
             <p className="text-xs text-muted-foreground uppercase">
               {crypto.symbol}
             </p>
@@ -68,7 +70,9 @@ export const PriceCard: React.FC<PriceCardProps> = ({
 
       <div className="space-y-2">
         <div className="flex items-baseline justify-between">
-          <span className="text-lg font-bold text-foreground">{formatPrice(crypto.price)}</span>
+          <span className="text-lg font-bold text-foreground">
+            {formatPrice(crypto.price)}
+          </span>
           <span
             className={`text-sm font-medium ${
               isPositive ? "text-[hsl(160,84%,39%)]" : "text-destructive"

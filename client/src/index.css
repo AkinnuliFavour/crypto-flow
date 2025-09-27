@@ -24,27 +24,27 @@
 
 .dark {
   /* Primary Background Colors */
-  --bg-primary: #0f172a;      /* Main background - deep navy for sophistication */
-  --bg-secondary: #1e293b;    /* Card surfaces and elevated content areas */
-  --bg-tertiary: #334155;     /* Subtle borders, dividers, and card outlines */
-  --bg-hover: #475569;        /* Hover states for interactive elements */
+  --bg-primary: #0f172a; /* Main background - deep navy for sophistication */
+  --bg-secondary: #1e293b; /* Card surfaces and elevated content areas */
+  --bg-tertiary: #334155; /* Subtle borders, dividers, and card outlines */
+  --bg-hover: #475569; /* Hover states for interactive elements */
 
   /* Accent & Brand Colors */
-  --accent-primary: #3b82f6;    /* Primary blue - links, buttons, main CTAs */
-  --accent-secondary: #8b5cf6;  /* Electric purple - premium features, highlights */
-  --accent-gold: #f59e0b;       /* Crypto gold - Bitcoin content, special badges */
+  --accent-primary: #3b82f6; /* Primary blue - links, buttons, main CTAs */
+  --accent-secondary: #8b5cf6; /* Electric purple - premium features, highlights */
+  --accent-gold: #f59e0b; /* Crypto gold - Bitcoin content, special badges */
 
   /* Status & Semantic Colors */
-  --success: #10b981;     /* Positive price changes, success states */
-  --danger: #ef4444;      /* Negative price changes, error states */
-  --warning: #f97316;     /* Breaking news alerts, warnings */
-  --info: #06b6d4;        /* Neutral information, tips */
+  --success: #10b981; /* Positive price changes, success states */
+  --danger: #ef4444; /* Negative price changes, error states */
+  --warning: #f97316; /* Breaking news alerts, warnings */
+  --info: #06b6d4; /* Neutral information, tips */
 
   /* Text Hierarchy */
-  --text-primary: #f8fafc;    /* Headlines, important content - highest contrast */
-  --text-secondary: #cbd5e1;  /* Body text, descriptions - good readability */
-  --text-muted: #64748b;      /* Timestamps, metadata, less important text */
-  --text-disabled: #475569;   /* Inactive elements, disabled states */
+  --text-primary: #f8fafc; /* Headlines, important content - highest contrast */
+  --text-secondary: #cbd5e1; /* Body text, descriptions - good readability */
+  --text-muted: #64748b; /* Timestamps, metadata, less important text */
+  --text-disabled: #475569; /* Inactive elements, disabled states */
 
   /* Interactive States */
   --border-default: #334155;
@@ -52,7 +52,8 @@
   --border-focus: #3b82f6;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
 
   /* Tailwind-compatible HSL values for existing components */
   --background: 222.2 84% 4.9%; /* Converted from #0f172a */
@@ -88,7 +89,8 @@
 
   /* Smooth theme transitions */
   * {
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease,
+      color 0.2s ease;
   }
 
   /* Custom scrollbar */
@@ -135,7 +137,11 @@
 
   /* Premium gradient for special CTAs */
   .gradient-primary {
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--accent-primary) 0%,
+      var(--accent-secondary) 100%
+    );
   }
 
   /* Subtle card hover glow */
@@ -186,7 +192,8 @@
   }
 
   @keyframes pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {

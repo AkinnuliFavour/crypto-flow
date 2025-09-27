@@ -59,7 +59,9 @@ export const Watchlist: React.FC<WatchlistProps> = ({
                   className="h-8 w-8 rounded-full"
                 />
                 <div>
-                  <h4 className="font-medium text-sm text-foreground">{item.name}</h4>
+                  <h4 className="font-medium text-sm text-foreground">
+                    {item.name}
+                  </h4>
                   <p className="text-xs text-muted-foreground uppercase">
                     {item.symbol}
                   </p>
@@ -72,7 +74,9 @@ export const Watchlist: React.FC<WatchlistProps> = ({
                 </div>
                 <div
                   className={`text-xs flex items-center space-x-1 ${
-                    item.change24h >= 0 ? "text-[hsl(160,84%,39%)]" : "text-destructive"
+                    item.change24h >= 0
+                      ? "text-[hsl(160,84%,39%)]"
+                      : "text-destructive"
                   }`}
                 >
                   {item.change24h >= 0 ? (
@@ -131,7 +135,9 @@ export const Watchlist: React.FC<WatchlistProps> = ({
                   className="h-8 w-8 rounded-full"
                 />
                 <div>
-                  <h4 className="font-medium text-sm text-[var(--text-primary)]">{item.name}</h4>
+                  <h4 className="font-medium text-sm text-[var(--text-primary)]">
+                    {item.name}
+                  </h4>
                   <p className="text-xs text-[var(--text-muted)] uppercase">
                     {item.symbol}
                   </p>
@@ -144,7 +150,9 @@ export const Watchlist: React.FC<WatchlistProps> = ({
                 </div>
                 <div
                   className={`text-xs flex items-center space-x-1 ${
-                    item.change24h >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"
+                    item.change24h >= 0
+                      ? "text-[var(--success)]"
+                      : "text-[var(--danger)]"
                   }`}
                 >
                   {item.change24h >= 0 ? (

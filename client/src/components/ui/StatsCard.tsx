@@ -46,12 +46,16 @@ export const StatsCard: React.FC<StatsCardProps> = ({
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-2xl font-bold text-foreground">{formatValue(value)}</p>
+          <p className="text-2xl font-bold text-foreground">
+            {formatValue(value)}
+          </p>
           {change && (
             <p
               className={cn(
                 "text-xs font-medium",
-                isPositiveChange ? "text-[hsl(160,84%,39%)]" : "text-destructive"
+                isPositiveChange
+                  ? "text-[hsl(160,84%,39%)]"
+                  : "text-destructive"
               )}
             >
               {isPositiveChange ? "+" : ""}

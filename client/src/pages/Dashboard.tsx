@@ -95,7 +95,9 @@ export const Dashboard: React.FC = () => {
                       className="h-8 w-8 rounded-full"
                     />
                     <div>
-                      <h3 className="font-semibold text-foreground">{crypto.name}</h3>
+                      <h3 className="font-semibold text-foreground">
+                        {crypto.name}
+                      </h3>
                       <p className="text-sm text-muted-foreground uppercase">
                         {crypto.symbol}
                       </p>
@@ -145,7 +147,9 @@ export const Dashboard: React.FC = () => {
                         className="h-8 w-8 rounded-full"
                       />
                       <div>
-                        <h4 className="font-medium text-foreground">{item.name}</h4>
+                        <h4 className="font-medium text-foreground">
+                          {item.name}
+                        </h4>
                         <p className="text-sm text-muted-foreground">
                           {item.amount} {item.symbol.toUpperCase()}
                         </p>
@@ -157,7 +161,9 @@ export const Dashboard: React.FC = () => {
                       </div>
                       <div
                         className={`text-sm ${
-                          item.gainLoss >= 0 ? "text-[hsl(160,84%,39%)]" : "text-destructive"
+                          item.gainLoss >= 0
+                            ? "text-[hsl(160,84%,39%)]"
+                            : "text-destructive"
                         }`}
                       >
                         {item.gainLoss >= 0 ? "+" : ""}$
