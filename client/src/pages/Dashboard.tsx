@@ -95,21 +95,21 @@ export const Dashboard: React.FC = () => {
                       className="h-8 w-8 rounded-full"
                     />
                     <div>
-                      <h3 className="font-semibold">{crypto.name}</h3>
+                      <h3 className="font-semibold text-foreground">{crypto.name}</h3>
                       <p className="text-sm text-muted-foreground uppercase">
                         {crypto.symbol}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold">
+                    <div className="text-lg font-bold text-foreground">
                       ${crypto.price.toLocaleString()}
                     </div>
                     <div
                       className={`text-sm ${
                         crypto.change24h >= 0
-                          ? "text-green-600"
-                          : "text-red-600"
+                          ? "text-[hsl(160,84%,39%)]"
+                          : "text-destructive"
                       }`}
                     >
                       {crypto.change24h >= 0 ? "+" : ""}
@@ -132,7 +132,7 @@ export const Dashboard: React.FC = () => {
               {mockPortfolio.map((item) => (
                 <div
                   key={item.cryptoId}
-                  className="rounded-lg border bg-card p-4"
+                  className="rounded-lg border bg-card p-4 shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -145,19 +145,19 @@ export const Dashboard: React.FC = () => {
                         className="h-8 w-8 rounded-full"
                       />
                       <div>
-                        <h4 className="font-medium">{item.name}</h4>
+                        <h4 className="font-medium text-foreground">{item.name}</h4>
                         <p className="text-sm text-muted-foreground">
                           {item.amount} {item.symbol.toUpperCase()}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium">
+                      <div className="font-medium text-foreground">
                         ${item.totalValue.toFixed(2)}
                       </div>
                       <div
                         className={`text-sm ${
-                          item.gainLoss >= 0 ? "text-green-600" : "text-red-600"
+                          item.gainLoss >= 0 ? "text-[hsl(160,84%,39%)]" : "text-destructive"
                         }`}
                       >
                         {item.gainLoss >= 0 ? "+" : ""}$

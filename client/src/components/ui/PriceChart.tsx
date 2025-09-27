@@ -38,7 +38,8 @@ export const PriceChart: React.FC<PriceChartProps> = ({
     .join(" ");
 
   const isPositive = crypto.change24h >= 0;
-  const strokeColor = isPositive ? "#10b981" : "#ef4444";
+  const strokeColor = isPositive ? "hsl(160,84%,39%)" : "hsl(0,84%,60%)";
+  const mainLineColor = "hsl(217.2,91.2%,59.8%)";
 
   return (
     <div className="w-full" style={{ height }}>
@@ -111,7 +112,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({
         {/* Chart line */}
         <polyline
           fill="none"
-          stroke={strokeColor}
+          stroke={mainLineColor}
           strokeWidth="2"
           points={points}
           strokeLinecap="round"

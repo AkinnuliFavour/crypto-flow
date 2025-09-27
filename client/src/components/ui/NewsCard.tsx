@@ -22,20 +22,20 @@ export const NewsCard: React.FC<NewsCardProps> = ({
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      breaking: "bg-red-500",
-      bitcoin: "bg-orange-500",
-      altcoin: "bg-blue-500",
-      defi: "bg-purple-500",
-      regulation: "bg-green-500",
-      technology: "bg-indigo-500",
-      analysis: "bg-gray-500",
+      breaking: "bg-destructive",
+      bitcoin: "bg-[hsl(45,93%,47%)]", // Gold color
+      altcoin: "bg-primary",
+      defi: "bg-[hsl(262,83%,58%)]", // Purple color
+      regulation: "bg-[hsl(160,84%,39%)]", // Green color
+      technology: "bg-primary",
+      analysis: "bg-[hsl(188,95%,42%)]", // Cyan color
     };
-    return colors[category as keyof typeof colors] || "bg-gray-500";
+    return colors[category as keyof typeof colors] || "bg-muted";
   };
 
   if (variant === "featured") {
     return (
-      <article className="group relative overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md">
+      <article className="group relative overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/20 card-hover-glow">
         <Link to={`/news/${news.id}`}>
           <div className="aspect-[16/9] overflow-hidden">
             <img
@@ -57,7 +57,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
                 {news.source}
               </span>
             </div>
-            <h3 className="text-xl font-bold leading-tight mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+            <h3 className="text-xl font-bold leading-tight mb-3 line-clamp-2 group-hover:text-primary transition-colors text-foreground">
               {news.title}
             </h3>
             <p className="text-muted-foreground mb-4 line-clamp-3">
@@ -101,7 +101,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
                   {news.source}
                 </span>
               </div>
-              <h3 className="text-sm font-semibold leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+              <h3 className="text-sm font-semibold leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors text-foreground">
                 {news.title}
               </h3>
               <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
@@ -120,7 +120,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
 
   // Default variant
   return (
-    <article className="group overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md">
+    <article className="group overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/20 card-hover-glow">
       <Link to={`/news/${news.id}`}>
         <div className="aspect-[16/9] overflow-hidden">
           <img
@@ -140,7 +140,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
             </span>
             <span className="text-sm text-muted-foreground">{news.source}</span>
           </div>
-          <h3 className="text-lg font-semibold leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="text-lg font-semibold leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors text-foreground">
             {news.title}
           </h3>
           <p className="text-sm text-muted-foreground mb-3 line-clamp-2">

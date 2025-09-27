@@ -54,13 +54,13 @@ export const MarketOverview: React.FC<MarketOverviewProps> = ({ stats }) => {
         />
       </div>
 
-      <div className="rounded-lg border bg-card p-4">
-        <h4 className="font-medium mb-3">Trending Coins</h4>
+      <div className="rounded-lg border bg-card p-4 shadow-sm">
+        <h4 className="font-medium text-foreground mb-3">Trending Coins</h4>
         <div className="space-y-2">
           {stats.trendingCoins.map((coin) => (
             <div
               key={coin.id}
-              className="flex items-center justify-between py-2"
+              className="flex items-center justify-between py-2 hover:bg-accent/50 rounded px-2 transition-colors"
             >
               <div className="flex items-center space-x-3">
                 <img
@@ -69,19 +69,19 @@ export const MarketOverview: React.FC<MarketOverviewProps> = ({ stats }) => {
                   className="h-6 w-6 rounded-full"
                 />
                 <div>
-                  <span className="text-sm font-medium">{coin.name}</span>
+                  <span className="text-sm font-medium text-foreground">{coin.name}</span>
                   <span className="text-xs text-muted-foreground ml-2">
                     {coin.symbol.toUpperCase()}
                   </span>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm font-medium">
+                <div className="text-sm font-medium text-foreground">
                   ${coin.price.toLocaleString()}
                 </div>
                 <div
                   className={`text-xs ${
-                    coin.change24h >= 0 ? "text-green-600" : "text-red-600"
+                    coin.change24h >= 0 ? "text-[hsl(160,84%,39%)]" : "text-destructive"
                   }`}
                 >
                   {coin.change24h >= 0 ? "+" : ""}

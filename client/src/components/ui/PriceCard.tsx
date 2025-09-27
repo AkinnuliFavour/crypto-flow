@@ -53,25 +53,25 @@ export const PriceCard: React.FC<PriceCardProps> = ({
             className="h-8 w-8 rounded-full"
           />
           <div>
-            <h3 className="font-semibold text-sm">{crypto.name}</h3>
+            <h3 className="font-semibold text-sm text-foreground">{crypto.name}</h3>
             <p className="text-xs text-muted-foreground uppercase">
               {crypto.symbol}
             </p>
           </div>
         </div>
         {isPositive ? (
-          <TrendingUp className="h-4 w-4 text-green-500" />
+          <TrendingUp className="h-4 w-4 text-[hsl(160,84%,39%)]" />
         ) : (
-          <TrendingDown className="h-4 w-4 text-red-500" />
+          <TrendingDown className="h-4 w-4 text-destructive" />
         )}
       </div>
 
       <div className="space-y-2">
         <div className="flex items-baseline justify-between">
-          <span className="text-lg font-bold">{formatPrice(crypto.price)}</span>
+          <span className="text-lg font-bold text-foreground">{formatPrice(crypto.price)}</span>
           <span
             className={`text-sm font-medium ${
-              isPositive ? "text-green-500" : "text-red-500"
+              isPositive ? "text-[hsl(160,84%,39%)]" : "text-destructive"
             }`}
           >
             {isPositive ? "+" : ""}
@@ -92,7 +92,7 @@ export const PriceCard: React.FC<PriceCardProps> = ({
             >
               <polyline
                 fill="none"
-                stroke={isPositive ? "#10b981" : "#ef4444"}
+                stroke={isPositive ? "hsl(160,84%,39%)" : "hsl(0,84%,60%)"}
                 strokeWidth="1.5"
                 points={crypto.sparklineData
                   .map((price, index) => {

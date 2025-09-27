@@ -32,7 +32,7 @@ export const PriceTicker: React.FC<PriceTickerProps> = ({
 
   return (
     <div
-      className="relative overflow-hidden bg-card border rounded-lg py-4"
+      className="relative overflow-hidden bg-secondary border rounded-lg py-4"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -51,8 +51,8 @@ export const PriceTicker: React.FC<PriceTickerProps> = ({
       </div>
 
       {/* Gradient overlays for smooth edges */}
-      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-card to-transparent pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-secondary to-transparent pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-secondary to-transparent pointer-events-none" />
     </div>
   );
 };

@@ -64,7 +64,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
               variant="ghost"
               size="sm"
               onClick={toggleTheme}
-              className="h-9 w-9 p-0"
+              className={`h-9 w-9 p-0 ${
+                theme === "dark" ? "text-[hsl(45,93%,47%)]" : ""
+              }`}
             >
               {theme === "dark" ? (
                 <Sun className="h-4 w-4" />
