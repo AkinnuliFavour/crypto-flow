@@ -20,6 +20,18 @@ export const NewsCard: React.FC<NewsCardProps> = ({
     }).format(date);
   };
 
+  // Create article link - use URL if available (API data), otherwise use ID (mock data)
+  const getArticleLink = () => {
+    // Check if this is API data with a url property
+    if ("url" in news && typeof news.url === "string" && news.url) {
+      // For API data with URLs, encode the URL as base64
+      const encodedUrl = btoa(encodeURIComponent(news.url));
+      return `/article/${encodedUrl}`;
+    }
+    // For mock data with IDs
+    return `/news/${news.id}`;
+  };
+
   const getCategoryColor = (category: string) => {
     const colors = {
       breaking: "bg-destructive",
@@ -36,7 +48,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
   if (variant === "featured") {
     return (
       <article className="group relative overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/20 card-hover-glow">
-        <Link to={`/news/${news.id}`}>
+        <Link to={getArticleLink()}>
           <div className="aspect-[16/9] overflow-hidden">
             <img
               src={news.imageUrl}
@@ -85,7 +97,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
   if (variant === "compact") {
     return (
       <article className="group flex space-x-4 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
-        <Link to={`/news/${news.id}`} className="flex-1">
+        <Link to={getArticleLink()} className="flex-1">
           <div className="flex items-start space-x-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-2">
@@ -121,7 +133,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
   // Default variant
   return (
     <article className="group overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/20 card-hover-glow">
-      <Link to={`/news/${news.id}`}>
+      <Link to={getArticleLink()}>
         <div className="aspect-[16/9] overflow-hidden">
           <img
             src={news.imageUrl}

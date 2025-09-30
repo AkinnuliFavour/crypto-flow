@@ -9,7 +9,10 @@ const app: Express = express();
 // Middleware
 app.use(
   cors({
-    origin: config.CORS_ORIGIN,
+    origin:
+      config.NODE_ENV === "development"
+        ? config.CORS_ORIGIN.split(",").map((origin) => origin.trim())
+        : config.CORS_ORIGIN,
     credentials: true,
   })
 );

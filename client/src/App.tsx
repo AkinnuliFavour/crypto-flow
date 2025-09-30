@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { queryClient } from "./lib/queryClient";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { Home } from "./pages/Home";
@@ -10,21 +11,21 @@ import { Article } from "./pages/Article";
 import "./App.css";
 
 // Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 10, // 10 minutes
-      retry: (failureCount, error) => {
-        // Don't retry on 4xx errors
-        if (error instanceof Error && error.message.includes("4")) {
-          return false;
-        }
-        return failureCount < 3;
-      },
-    },
-  },
-});
+// const queryClient = new QueryClient({
+//   defaultOptions: {
+//     queries: {
+//       staleTime: 1000 * 60 * 5, // 5 minutes
+//       gcTime: 1000 * 60 * 10, // 10 minutes
+//       retry: (failureCount, error) => {
+//         // Don't retry on 4xx errors
+//         if (error instanceof Error && error.message.includes("4")) {
+//           return false;
+//         }
+//         return failureCount < 3;
+//       },
+//     },
+//   },
+// });
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/news/:id" element={<Article />} />
+                <Route path="/article/*" element={<Article />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 {/* 404 route */}
                 <Route
