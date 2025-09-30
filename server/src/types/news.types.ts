@@ -28,3 +28,29 @@ export interface ArticleDetailsResponse {
   url: string;
   article?: NewsArticle;
 }
+
+export interface ArticleContent {
+  title: string;
+  content: string;
+  description?: string;
+  url: string;
+  author?: string;
+  publishedAt?: string;
+  image?: string;
+  siteName?: string;
+}
+
+export interface JinaReaderResponse {
+  code: number;
+  status: number;
+  data: {
+    title: string;
+    description?: string;
+    url: string;
+    content: string;
+    author?: string;
+    publishedTime?: string;
+    images?: string[];
+    siteName?: string;
+  };
+}

@@ -69,15 +69,18 @@ router.get("/article", async (req: Request, res: Response) => {
       return res.status(400).json(errorResponse);
     }
 
-    const articleDetails = await newsService.getArticleDetails(articleUrl);
+    // Validate URL format
+    try {
+      new URL(articleUrl);
+    } catch {
+      const errorResponse: ErrorResponse = {
+        error: "Invalid URL format",
+      };
+      return res.status(400).json(errorResponse);
+    }
 
-    const response: ArticleDetailsResponse = {
-      message: "Article details",
-      url: articleUrl,
-      article: articleDetails || undefined,
-    };
-
-    res.json(response);
+    const articleContent = await newsService.getArticleDetails(articleUrl);
+    res.json(articleContent);
   } catch (error) {
     console.error("Error fetching article details:", error);
     const errorResponse: ErrorResponse = {
