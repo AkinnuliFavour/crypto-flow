@@ -13,3 +13,4 @@ export { CategoryTabs } from "./CategoryTabs";
 export { TrendingTopics } from "./TrendingTopics";
 export { MarketOverview } from "./MarketOverview";
 export { Watchlist } from "./Watchlist";
+export { CoinGeckoExample } from "./CoinGeckoExample";
