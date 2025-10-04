@@ -99,10 +99,10 @@ export const Article: React.FC = () => {
     );
   }
 
-  // Transform related articles to match the expected format
+  // Transform related articles from NewsAPI format to NewsCard format
   const relatedArticles =
-    relatedNewsData?.articles?.slice(0, 3).map((article, index) => ({
-      id: article.url || `related-${index}`,
+    relatedNewsData?.articles?.slice(0, 3).map((article) => ({
+      id: article.url,
       title: article.title,
       excerpt: article.description || "",
       content: article.content || "Content not available",
@@ -113,7 +113,6 @@ export const Article: React.FC = () => {
       category: "bitcoin" as const,
       tags: [],
       readTime: Math.max(1, Math.floor((article.content?.length || 0) / 200)),
-      url: article.url, // Add URL for proper linking
     })) || [];
 
   // Mock comments
@@ -144,15 +143,20 @@ export const Article: React.FC = () => {
     },
   ];
 
-  const formatDate = (date: string | Date) => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(dateObj);
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return "Unknown date";
+    try {
+      const dateObj = new Date(dateString);
+      return new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(dateObj);
+    } catch {
+      return "Invalid date";
+    }
   };
 
   const handleShare = () => {
@@ -185,10 +189,10 @@ export const Article: React.FC = () => {
         <header className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
             <span className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium text-white bg-blue-500">
-              Crypto News
+              {articleData.siteName || "News Article"}
             </span>
             <span className="text-muted-foreground">
-              {articleData.siteName || "Unknown Source"}
+              {articleData.siteName ? `${articleData.siteName} • Crypto News` : "Crypto News"}
             </span>
           </div>
 
@@ -209,6 +213,11 @@ export const Article: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <User className="h-4 w-4" />
                   <span>{articleData.author}</span>
+                </div>
+              )}
+              {articleData.siteName && (
+                <div className="flex items-center space-x-2">
+                  <span className="font-medium">{articleData.siteName}</span>
                 </div>
               )}
               {articleData.publishedAt && (
@@ -262,7 +271,7 @@ export const Article: React.FC = () => {
             <img
               src={articleData.image}
               alt={articleData.title}
-              className="w-full h-64 md:h-96 object-cover rounded-lg"
+              className="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
               onError={(e) => {
                 e.currentTarget.style.display = "none";
               }}
@@ -272,9 +281,21 @@ export const Article: React.FC = () => {
 
         {/* Article Content */}
         <div className="prose prose-lg max-w-none mb-12">
-          <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
-            {articleData.content}
-          </div>
+          <div
+            className="text-muted-foreground leading-relaxed"
+            dangerouslySetInnerHTML={{
+              __html: articleData.content
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/```(.*?)```/gs, '<pre><code>$1</code></pre>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/^\s*[-*+]\s+(.*)$/gm, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+                .replace(/^\d+\.\s+(.*)$/gm, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>)/s, '<ol>$1</ol>')
+            }}
+          />
         </div>
 
         {/* Social Sharing */}
@@ -337,7 +358,7 @@ export const Article: React.FC = () => {
                         {comment.author}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {formatDate(comment.publishedAt)}
+                        {formatDate(comment.publishedAt.toISOString())}
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground mb-2">
