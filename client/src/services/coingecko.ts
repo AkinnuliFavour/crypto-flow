@@ -118,10 +118,18 @@ export const coingeckoApi = {
     vsCurrency: string = "usd"
   ): Promise<Record<string, CoinPrice>> => {
     const ids = coinIds.join(",");
-    const response = await coingeckoClient.get<Record<string, CoinPrice>>(
-      `/simple/price?ids=${ids}&vs_currencies=${vsCurrency}&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true`
+    // Use the markets endpoint instead of simple/price to get all coin details including symbol
+    const response = await coingeckoClient.get<CoinPrice[]>(
+      `/coins/markets?ids=${ids}&vs_currency=${vsCurrency}&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=24h`
     );
-    return response.data;
+    
+    // Convert array to object with coin id as key
+    const result: Record<string, CoinPrice> = {};
+    response.data.forEach(coin => {
+      result[coin.id] = coin;
+    });
+    
+    return result;
   },
 
   /**

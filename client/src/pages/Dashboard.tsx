@@ -59,15 +59,15 @@ export const Dashboard: React.FC = () => {
     ? Object.values(coinPrices)
         .slice(0, 4)
         .map((coin) => ({
-          id: coin.id,
-          symbol: coin.symbol.toUpperCase(),
-          name: coin.name,
-          price: coin.current_price,
+          id: coin.id || '',
+          symbol: coin.symbol?.toUpperCase() || '',
+          name: coin.name || '',
+          price: coin.current_price || 0,
           change24h: coin.price_change_percentage_24h || 0,
           change7d: 0, // CoinGecko simple price doesn't include 7d change
-          marketCap: coin.market_cap,
-          volume24h: coin.total_volume,
-          imageUrl: coin.image,
+          marketCap: coin.market_cap || 0,
+          volume24h: coin.total_volume || 0,
+          imageUrl: coin.image || '',
           sparklineData: [], // Will be populated from chart data if available
         }))
     : mockCryptoData.slice(0, 4);
@@ -96,15 +96,15 @@ export const Dashboard: React.FC = () => {
         activeCryptocurrencies: marketOverview.length,
         trendingCoins:
           trendingCoins?.coins.slice(0, 5).map(({ item }) => ({
-            id: item.id,
-            symbol: item.symbol.toUpperCase(),
-            name: item.name,
+            id: item.id || '',
+            symbol: item.symbol?.toUpperCase() || '',
+            name: item.name || '',
             price: 0, // Trending API doesn't provide price
             change24h: 0,
             change7d: 0,
             marketCap: 0,
             volume24h: 0,
-            imageUrl: item.large,
+            imageUrl: item.large || '',
             sparklineData: [],
           })) || [],
       }
@@ -265,7 +265,7 @@ export const Dashboard: React.FC = () => {
                           {item.name}
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                          {item.amount} {item.symbol.toUpperCase()}
+                          {item.amount} {item.symbol?.toUpperCase() || ''}
                         </p>
                       </div>
                     </div>
@@ -355,7 +355,7 @@ export const Dashboard: React.FC = () => {
                         {item.name}
                       </h3>
                       <p className="text-sm text-muted-foreground uppercase">
-                        {item.symbol}
+                        {item.symbol || ''}
                       </p>
                     </div>
                   </div>
