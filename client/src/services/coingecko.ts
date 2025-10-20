@@ -64,6 +64,7 @@ export interface CoinPrice {
   low_24h: number;
   price_change_24h: number;
   price_change_percentage_24h: number;
+  price_change_percentage_7d_in_currency?: number;
   market_cap_change_24h: number;
   market_cap_change_percentage_24h: number;
   circulating_supply: number;
@@ -122,13 +123,13 @@ export const coingeckoApi = {
     const response = await coingeckoClient.get<CoinPrice[]>(
       `/coins/markets?ids=${ids}&vs_currency=${vsCurrency}&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=24h`
     );
-    
+
     // Convert array to object with coin id as key
     const result: Record<string, CoinPrice> = {};
-    response.data.forEach(coin => {
+    response.data.forEach((coin) => {
       result[coin.id] = coin;
     });
-    
+
     return result;
   },
 

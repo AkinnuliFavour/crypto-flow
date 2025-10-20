@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { coingeckoApi } from "../services/coingecko";
+import type { CryptoData } from "../types";
 
 export interface UseCoinPricesOptions {
   coinIds: string[];
@@ -118,4 +119,41 @@ export const useCoinPrice = (
     ...queryResult,
     data: data ? data[coinId] : undefined,
   };
+};
+
+/**
+ * Hook for fetching top cryptocurrencies for price ticker display
+ * Includes sparkline data for charts
+ */
+export const useTopCryptos = (options?: {
+  limit?: number;
+  enabled?: boolean;
+}) => {
+  const { limit = 10, enabled = true } = options || {};
+
+  return useQuery({
+    queryKey: ["coingecko", "top-cryptos", limit],
+    queryFn: async () => {
+      const coins = await coingeckoApi.getMarketOverview("usd", limit, 1, true);
+
+      // Transform CoinGecko data to our CryptoData format
+      return coins.map(
+        (coin): CryptoData => ({
+          id: coin.id,
+          symbol: coin.symbol.toUpperCase(),
+          name: coin.name,
+          price: coin.current_price,
+          change24h: coin.price_change_percentage_24h || 0,
+          change7d: coin.price_change_percentage_7d_in_currency || 0,
+          marketCap: coin.market_cap,
+          volume24h: coin.total_volume,
+          imageUrl: coin.image,
+          sparklineData: coin.sparkline_in_7d?.price || [],
+        })
+      );
+    },
+    enabled,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    refetchInterval: 1000 * 60 * 5, // 5 minutes
+  });
 };

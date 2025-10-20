@@ -9,16 +9,18 @@ import {
 } from "lucide-react";
 import { Layout } from "../components/layout";
 import { NewsCard, PriceTicker, StatsCard, Button } from "../components/ui";
-import {
-  mockNewsArticles,
-  mockCryptoData,
-  mockMarketStats,
-} from "../data/mockData";
+import { mockNewsArticles, mockMarketStats } from "../data/mockData";
+import { useTopCryptos } from "../hooks/useCoinGecko";
 
 export const Home: React.FC = () => {
   const featuredNews = mockNewsArticles.slice(0, 4);
   const recentNews = mockNewsArticles.slice(0, 6);
-  const topCryptos = mockCryptoData.slice(0, 10);
+
+  const {
+    data: topCryptos = [],
+    isLoading: cryptosLoading,
+    error: cryptosError,
+  } = useTopCryptos({ limit: 10 });
 
   return (
     <Layout>
@@ -52,7 +54,27 @@ export const Home: React.FC = () => {
       {/* Price Ticker */}
       <section className="py-8 border-y bg-muted/20">
         <div className="container mx-auto px-4">
-          <PriceTicker cryptos={topCryptos} />
+          {cryptosLoading ? (
+            <div className="flex items-center justify-center h-20">
+              <div className="text-muted-foreground">
+                Loading cryptocurrency data...
+              </div>
+            </div>
+          ) : cryptosError ? (
+            <div className="flex items-center justify-center h-20">
+              <div className="text-destructive">
+                Failed to load cryptocurrency data
+              </div>
+            </div>
+          ) : topCryptos.length > 0 ? (
+            <PriceTicker cryptos={topCryptos} />
+          ) : (
+            <div className="flex items-center justify-center h-20">
+              <div className="text-muted-foreground">
+                No cryptocurrency data available
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

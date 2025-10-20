@@ -25,5 +25,5 @@ export const config: EnvConfig = {
   JINA_API_KEY: getEnvVariable("JINA_API_KEY", ""), // Optional
   PORT: parseInt(getEnvVariable("PORT", "3001"), 10),
   NODE_ENV: getEnvVariable("NODE_ENV", "development"),
-  CORS_ORIGIN: getEnvVariable("CORS_ORIGIN", "http://localhost:3000"),
+  CORS_ORIGIN: getEnvVariable("CORS_ORIGIN", "http://localhost:5173"),
 };
