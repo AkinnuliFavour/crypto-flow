@@ -109,6 +109,19 @@ export interface TrendingResponse {
   }>;
 }
 
+export interface GlobalMarketData {
+  active_cryptocurrencies: number;
+  upcoming_icos: number;
+  ongoing_icos: number;
+  ended_icos: number;
+  markets: number;
+  total_market_cap: Record<string, number>;
+  total_volume: Record<string, number>;
+  market_cap_percentage: Record<string, number>;
+  market_cap_change_percentage_24h_usd: number;
+  updated_at: number;
+}
+
 // API service methods
 export const coingeckoApi = {
   /**
@@ -170,5 +183,15 @@ export const coingeckoApi = {
       "/search/trending"
     );
     return response.data;
+  },
+
+  /**
+   * Fetch global market data (total market cap, volume, BTC dominance, etc.)
+   */
+  getGlobalMarketData: async (): Promise<GlobalMarketData> => {
+    const response = await coingeckoClient.get<{ data: GlobalMarketData }>(
+      "/global"
+    );
+    return response.data.data;
   },
 };

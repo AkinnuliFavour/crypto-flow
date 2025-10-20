@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import { Layout } from "../components/layout";
 import { NewsCard, PriceTicker, StatsCard, Button } from "../components/ui";
-import { mockNewsArticles, mockMarketStats } from "../data/mockData";
-import { useTopCryptos } from "../hooks/useCoinGecko";
+import { mockNewsArticles } from "../data/mockData";
+import { useTopCryptos, useGlobalMarketStats } from "../hooks/useCoinGecko";
 
 export const Home: React.FC = () => {
   const featuredNews = mockNewsArticles.slice(0, 4);
@@ -21,6 +21,12 @@ export const Home: React.FC = () => {
     isLoading: cryptosLoading,
     error: cryptosError,
   } = useTopCryptos({ limit: 10 });
+
+  const {
+    data: marketStats,
+    isLoading: marketStatsLoading,
+    error: marketStatsError,
+  } = useGlobalMarketStats();
 
   return (
     <Layout>
@@ -84,28 +90,46 @@ export const Home: React.FC = () => {
           <h2 className="text-3xl font-bold text-center mb-8">
             Market Overview
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatsCard
-              title="Total Market Cap"
-              value={mockMarketStats.totalMarketCap}
-              icon={DollarSign}
-            />
-            <StatsCard
-              title="24h Volume"
-              value={mockMarketStats.totalVolume24h}
-              icon={BarChart3}
-            />
-            <StatsCard
-              title="BTC Dominance"
-              value={`${mockMarketStats.btcDominance}%`}
-              icon={TrendingUp}
-            />
-            <StatsCard
-              title="Active Cryptos"
-              value={mockMarketStats.activeCryptocurrencies}
-              icon={Users}
-            />
-          </div>
+          {marketStatsLoading ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-muted-foreground">
+                Loading market data...
+              </div>
+            </div>
+          ) : marketStatsError ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-destructive">Failed to load market data</div>
+            </div>
+          ) : marketStats ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <StatsCard
+                title="Total Market Cap"
+                value={marketStats.totalMarketCap}
+                icon={DollarSign}
+              />
+              <StatsCard
+                title="24h Volume"
+                value={marketStats.totalVolume24h}
+                icon={BarChart3}
+              />
+              <StatsCard
+                title="BTC Dominance"
+                value={`${marketStats.btcDominance.toFixed(1)}%`}
+                icon={TrendingUp}
+              />
+              <StatsCard
+                title="Active Cryptos"
+                value={marketStats.activeCryptocurrencies}
+                icon={Users}
+              />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-muted-foreground">
+                No market data available
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

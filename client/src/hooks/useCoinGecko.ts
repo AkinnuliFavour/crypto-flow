@@ -157,3 +157,29 @@ export const useTopCryptos = (options?: {
     refetchInterval: 1000 * 60 * 5, // 5 minutes
   });
 };
+
+/**
+ * Hook for fetching global market statistics
+ */
+export const useGlobalMarketStats = (options?: { enabled?: boolean }) => {
+  const { enabled = true } = options || {};
+
+  return useQuery({
+    queryKey: ["coingecko", "global-market-stats"],
+    queryFn: async () => {
+      const globalData = await coingeckoApi.getGlobalMarketData();
+
+      // Transform to our MarketStats format
+      return {
+        totalMarketCap: globalData.total_market_cap.usd,
+        totalVolume24h: globalData.total_volume.usd,
+        btcDominance: globalData.market_cap_percentage.btc,
+        activeCryptocurrencies: globalData.active_cryptocurrencies,
+        trendingCoins: [], // We'll keep this empty for now, could be populated separately
+      };
+    },
+    enabled,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchInterval: 1000 * 60 * 10, // 10 minutes
+  });
+};
