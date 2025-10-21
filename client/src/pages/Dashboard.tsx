@@ -20,9 +20,14 @@ import {
   mockMarketStats,
   mockPortfolio,
   mockWatchlist,
-  mockNewsArticles,
 } from "../data/mockData";
-import { useCoinPrices, useMarketOverview, useTrendingCoins } from "../hooks";
+import {
+  useCoinPrices,
+  useMarketOverview,
+  useCoinChart,
+  useTopCryptos,
+} from "../hooks/useCoinGecko";
+import { useCryptoNews } from "../hooks/useNews";
 
 export const Dashboard: React.FC = () => {
   // CoinGecko API hooks
@@ -50,26 +55,78 @@ export const Dashboard: React.FC = () => {
     data: trendingCoins,
     isLoading: trendingLoading,
     error: trendingError,
-  } = useTrendingCoins();
+  } = useTopCryptos({ limit: 6 });
 
-  console.log(coinPrices);
+  // Fetch live crypto news
+  const {
+    data: cryptoNews,
+    isLoading: newsLoading,
+    error: newsError,
+  } = useCryptoNews(1, 50); // Get first page with 50 articles
+
+  // Fetch chart data for each coin
+  const { data: btcChart } = useCoinChart({ coinId: "bitcoin", days: 7 });
+  const { data: ethChart } = useCoinChart({ coinId: "ethereum", days: 7 });
+  const { data: bnbChart } = useCoinChart({ coinId: "binancecoin", days: 7 });
+  const { data: solChart } = useCoinChart({ coinId: "solana", days: 7 });
+
+  // Extract portfolio and watchlist coin IDs
+  const portfolioCoinIds = mockPortfolio.map((item) => item.cryptoId);
+  const watchlistCoinIds = mockWatchlist.map((item) => item.cryptoId);
+  const allCoinIds = [...new Set([...portfolioCoinIds, ...watchlistCoinIds])];
+
+  // Fetch live prices for portfolio and watchlist coins
+  const {
+    data: portfolioWatchlistPrices,
+    isLoading: portfolioWatchlistLoading,
+    error: portfolioWatchlistError,
+  } = useCoinPrices({
+    coinIds: allCoinIds,
+    vsCurrency: "usd",
+    refetchInterval: 30000, // Update every 30 seconds
+  });
 
   // Transform CoinGecko data to match component expectations
   const topCryptos = coinPrices
     ? Object.values(coinPrices)
         .slice(0, 4)
-        .map((coin) => ({
-          id: coin.id || '',
-          symbol: coin.symbol?.toUpperCase() || '',
-          name: coin.name || '',
-          price: coin.current_price || 0,
-          change24h: coin.price_change_percentage_24h || 0,
-          change7d: 0, // CoinGecko simple price doesn't include 7d change
-          marketCap: coin.market_cap || 0,
-          volume24h: coin.total_volume || 0,
-          imageUrl: coin.image || '',
-          sparklineData: [], // Will be populated from chart data if available
-        }))
+        .map((coin) => {
+          // Get chart data for this coin
+          let chartData;
+          switch (coin.id) {
+            case "bitcoin":
+              chartData = btcChart;
+              break;
+            case "ethereum":
+              chartData = ethChart;
+              break;
+            case "binancecoin":
+              chartData = bnbChart;
+              break;
+            case "solana":
+              chartData = solChart;
+              break;
+            default:
+              chartData = null;
+          }
+
+          // Extract prices from chart data (only price values, not timestamps)
+          const sparklineData =
+            chartData?.prices?.map(([, price]) => price) || [];
+
+          return {
+            id: coin.id || "",
+            symbol: coin.symbol?.toUpperCase() || "",
+            name: coin.name || "",
+            price: coin.current_price || 0,
+            change24h: coin.price_change_percentage_24h || 0,
+            change7d: coin.price_change_percentage_7d_in_currency || 0,
+            marketCap: coin.market_cap || 0,
+            volume24h: coin.total_volume || 0,
+            imageUrl: coin.image || "",
+            sparklineData, // Now populated with real chart data
+          };
+        })
     : mockCryptoData.slice(0, 4);
 
   // Transform market overview data
@@ -94,41 +151,83 @@ export const Dashboard: React.FC = () => {
               100
             : 0,
         activeCryptocurrencies: marketOverview.length,
-        trendingCoins:
-          trendingCoins?.coins.slice(0, 5).map(({ item }) => ({
-            id: item.id || '',
-            symbol: item.symbol?.toUpperCase() || '',
-            name: item.name || '',
-            price: 0, // Trending API doesn't provide price
-            change24h: 0,
-            change7d: 0,
-            marketCap: 0,
-            volume24h: 0,
-            imageUrl: item.large || '',
-            sparklineData: [],
-          })) || [],
+        trendingCoins: trendingCoins?.slice(0, 5) || [],
       }
     : mockMarketStats;
-  const portfolioValue = mockPortfolio.reduce(
+
+  // Transform portfolio data with live prices
+  const livePortfolio = mockPortfolio.map((item) => {
+    const livePriceData = portfolioWatchlistPrices?.[item.cryptoId];
+    const livePrice = livePriceData?.current_price || item.currentPrice;
+
+    const totalValue = item.amount * livePrice;
+    const gainLoss = (livePrice - item.averagePrice) * item.amount;
+    const gainLossPercent =
+      ((livePrice - item.averagePrice) / item.averagePrice) * 100;
+
+    return {
+      ...item,
+      currentPrice: livePrice,
+      totalValue,
+      gainLoss,
+      gainLossPercent,
+    };
+  });
+
+  // Transform watchlist data with live prices
+  const liveWatchlist = mockWatchlist.map((item) => {
+    const livePriceData = portfolioWatchlistPrices?.[item.cryptoId];
+    const livePrice = livePriceData?.current_price || item.price;
+    const change24h =
+      livePriceData?.price_change_percentage_24h || item.change24h;
+
+    return {
+      ...item,
+      price: livePrice,
+      change24h,
+    };
+  });
+
+  const portfolioValue = livePortfolio.reduce(
     (total, item) => total + item.totalValue,
     0
   );
-  const portfolioChange = mockPortfolio.reduce((total, item) => {
+  const portfolioChange = livePortfolio.reduce((total, item) => {
     const change = (item.gainLoss / (item.totalValue - item.gainLoss)) * 100;
     return total + change * (item.totalValue / portfolioValue);
   }, 0);
 
-  const watchlistNews = mockNewsArticles
-    .filter((news) =>
-      mockWatchlist.some((watchItem) =>
-        news.tags.some(
-          (tag) =>
-            tag.toLowerCase().includes(watchItem.symbol.toLowerCase()) ||
-            tag.toLowerCase().includes(watchItem.name.toLowerCase())
-        )
+  // Transform live news data to match component expectations and filter by watchlist
+  const watchlistNews =
+    cryptoNews?.articles
+      ?.map((article) => ({
+        id: article.url, // Use URL as ID for API data
+        title: article.title,
+        excerpt: article.description || article.title,
+        content: article.content || article.description || "",
+        imageUrl: article.urlToImage || "",
+        source: article.source.name,
+        author: article.author || "Unknown",
+        publishedAt: new Date(article.publishedAt),
+        category: "analysis" as const, // Default category for API news
+        tags: [], // API doesn't provide tags, could extract from title/description
+        readTime: Math.max(
+          1,
+          Math.ceil((article.content?.length || 500) / 200)
+        ), // Estimate read time
+        url: article.url,
+      }))
+      .filter((news) =>
+        mockWatchlist.some((watchItem) => {
+          const watchlistTerms = [
+            watchItem.symbol.toLowerCase(),
+            watchItem.name.toLowerCase(),
+          ];
+          const newsText = `${news.title} ${news.excerpt}`.toLowerCase();
+          return watchlistTerms.some((term) => newsText.includes(term));
+        })
       )
-    )
-    .slice(0, 6);
+      .slice(0, 6) || [];
 
   return (
     <Layout>
@@ -155,12 +254,12 @@ export const Dashboard: React.FC = () => {
           />
           <StatsCard
             title="Total Assets"
-            value={mockPortfolio.length}
+            value={livePortfolio.length}
             icon={PieChart}
           />
           <StatsCard
             title="Watchlist Items"
-            value={mockWatchlist.length}
+            value={liveWatchlist.length}
             icon={Target}
           />
         </div>
@@ -244,58 +343,120 @@ export const Dashboard: React.FC = () => {
           {/* Portfolio */}
           <div>
             <h2 className="text-2xl font-bold mb-6">Portfolio</h2>
-            <div className="space-y-4">
-              {mockPortfolio.map((item) => (
-                <div
-                  key={item.cryptoId}
-                  className="rounded-lg border bg-card p-4 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <img
-                        src={
-                          mockCryptoData.find((c) => c.id === item.cryptoId)
-                            ?.imageUrl
-                        }
-                        alt={item.name}
-                        className="h-8 w-8 rounded-full"
-                      />
-                      <div>
-                        <h4 className="font-medium text-foreground">
-                          {item.name}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">
-                          {item.amount} {item.symbol?.toUpperCase() || ''}
-                        </p>
+            {portfolioWatchlistLoading ? (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-lg border bg-card p-4 shadow-sm animate-pulse"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
+                        <div>
+                          <div className="h-4 bg-gray-200 rounded w-20 mb-1"></div>
+                          <div className="h-3 bg-gray-200 rounded w-12"></div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-medium text-foreground">
-                        ${item.totalValue.toFixed(2)}
-                      </div>
-                      <div
-                        className={`text-sm ${
-                          item.gainLoss >= 0
-                            ? "text-[hsl(160,84%,39%)]"
-                            : "text-destructive"
-                        }`}
-                      >
-                        {item.gainLoss >= 0 ? "+" : ""}$
-                        {item.gainLoss.toFixed(2)}(
-                        {item.gainLossPercent >= 0 ? "+" : ""}
-                        {item.gainLossPercent.toFixed(2)}%)
+                      <div className="text-right">
+                        <div className="h-5 bg-gray-200 rounded w-16 mb-1"></div>
+                        <div className="h-4 bg-gray-200 rounded w-12"></div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : portfolioWatchlistError ? (
+              <div className="text-center py-8 text-red-600">
+                <p>
+                  Failed to load portfolio data:{" "}
+                  {portfolioWatchlistError.message}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {livePortfolio.map((item) => (
+                  <div
+                    key={item.cryptoId}
+                    className="rounded-lg border bg-card p-4 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <img
+                          src={
+                            mockCryptoData.find((c) => c.id === item.cryptoId)
+                              ?.imageUrl
+                          }
+                          alt={item.name}
+                          className="h-8 w-8 rounded-full"
+                        />
+                        <div>
+                          <h4 className="font-medium text-foreground">
+                            {item.name}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {item.amount} {item.symbol?.toUpperCase() || ""}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-medium text-foreground">
+                          ${item.totalValue.toFixed(2)}
+                        </div>
+                        <div
+                          className={`text-sm ${
+                            item.gainLoss >= 0
+                              ? "text-[hsl(160,84%,39%)]"
+                              : "text-destructive"
+                          }`}
+                        >
+                          {item.gainLoss >= 0 ? "+" : ""}$
+                          {item.gainLoss.toFixed(2)}(
+                          {item.gainLossPercent >= 0 ? "+" : ""}
+                          {item.gainLossPercent.toFixed(2)}%)
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Watchlist */}
           <div>
             <h2 className="text-2xl font-bold mb-6">Watchlist</h2>
-            <Watchlist items={mockWatchlist} />
+            {portfolioWatchlistLoading ? (
+              <div className="space-y-4">
+                {[...Array(4)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-lg border bg-card p-4 shadow-sm animate-pulse"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-200 rounded w-20 mb-1"></div>
+                        <div className="h-3 bg-gray-200 rounded w-12"></div>
+                      </div>
+                      <div className="text-right">
+                        <div className="h-4 bg-gray-200 rounded w-16 mb-1"></div>
+                        <div className="h-3 bg-gray-200 rounded w-12"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : portfolioWatchlistError ? (
+              <div className="text-center py-8 text-red-600">
+                <p>
+                  Failed to load watchlist data:{" "}
+                  {portfolioWatchlistError.message}
+                </p>
+              </div>
+            ) : (
+              <Watchlist items={liveWatchlist} />
+            )}
           </div>
         </div>
 
@@ -339,32 +500,47 @@ export const Dashboard: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {trendingCoins?.coins.slice(0, 6).map(({ item }) => (
+              {trendingCoins?.slice(0, 6).map((crypto) => (
                 <div
-                  key={item.id}
+                  key={crypto.id}
                   className="rounded-lg border bg-card p-4 shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center space-x-3">
                     <img
-                      src={item.large}
-                      alt={item.name}
+                      src={crypto.imageUrl}
+                      alt={crypto.name}
                       className="h-10 w-10 rounded-full"
                     />
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-semibold text-foreground">
-                        {item.name}
+                        {crypto.name}
                       </h3>
                       <p className="text-sm text-muted-foreground uppercase">
-                        {item.symbol || ''}
+                        {crypto.symbol}
                       </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-foreground">
+                        ${crypto.price.toLocaleString()}
+                      </div>
+                      <div
+                        className={`text-xs ${
+                          crypto.change24h >= 0
+                            ? "text-[hsl(160,84%,39%)]"
+                            : "text-destructive"
+                        }`}
+                      >
+                        {crypto.change24h >= 0 ? "+" : ""}
+                        {crypto.change24h.toFixed(2)}%
+                      </div>
                     </div>
                   </div>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                      Rank #{item.market_cap_rank}
+                      Market Cap: ${(crypto.marketCap / 1e9).toFixed(2)}B
                     </div>
                     <div className="text-sm font-medium text-foreground">
-                      Score: {item.score.toFixed(1)}
+                      Vol: ${(crypto.volume24h / 1e9).toFixed(2)}B
                     </div>
                   </div>
                 </div>
@@ -376,7 +552,24 @@ export const Dashboard: React.FC = () => {
         {/* Personalized News Feed */}
         <section>
           <h2 className="text-2xl font-bold mb-6">News from Your Watchlist</h2>
-          {watchlistNews.length > 0 ? (
+          {newsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="aspect-[16/9] bg-gray-200 rounded-lg mb-4"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : newsError ? (
+            <div className="text-center py-8 text-red-600">
+              <p>Failed to load news: {newsError.message}</p>
+            </div>
+          ) : watchlistNews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {watchlistNews.map((news) => (
                 <NewsCard key={news.id} news={news} />
