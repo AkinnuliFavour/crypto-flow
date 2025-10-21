@@ -11,6 +11,9 @@ import { Layout } from "../components/layout";
 import { NewsCard, PriceTicker, StatsCard, Button } from "../components/ui";
 import { mockNewsArticles } from "../data/mockData";
 import { useTopCryptos, useGlobalMarketStats } from "../hooks/useCoinGecko";
+import { useCryptoNews } from "../hooks/useNews";
+import type { NewsArticle } from "../types";
+import type { NewsArticle as ApiNewsArticle } from "../types/news.types";
 
 export const Home: React.FC = () => {
   const featuredNews = mockNewsArticles.slice(0, 4);
@@ -27,6 +30,47 @@ export const Home: React.FC = () => {
     isLoading: marketStatsLoading,
     error: marketStatsError,
   } = useGlobalMarketStats();
+
+  // Fetch live crypto news
+  const {
+    data: cryptoNewsData,
+    isLoading: newsLoading,
+    error: newsError,
+  } = useCryptoNews(1, 8); // Get first 8 articles for featured and recent
+
+  // Transform API news data to match NewsArticle interface
+  const transformNewsArticle = (apiArticle: ApiNewsArticle): NewsArticle => ({
+    id: apiArticle.url, // Use URL as unique ID
+    title: apiArticle.title,
+    excerpt: apiArticle.description || apiArticle.title,
+    content: apiArticle.content || apiArticle.description || "",
+    imageUrl: apiArticle.urlToImage || "/placeholder-news.jpg",
+    source:
+      typeof apiArticle.source === "object"
+        ? apiArticle.source.name
+        : apiArticle.source,
+    author: apiArticle.author || "Unknown",
+    publishedAt: new Date(apiArticle.publishedAt),
+    category: "bitcoin", // Default category, could be enhanced with AI classification
+    tags: ["crypto", "news"],
+    readTime: Math.max(
+      1,
+      Math.ceil((apiArticle.content?.length || 1000) / 200)
+    ), // Rough estimate
+    url: apiArticle.url, // Add the URL property for NewsCard navigation
+  });
+
+  // Use live data if available, fallback to mock data
+  const liveFeaturedNews =
+    cryptoNewsData?.articles?.slice(0, 4).map(transformNewsArticle) || [];
+  const liveRecentNews =
+    cryptoNewsData?.articles?.slice(0, 6).map(transformNewsArticle) || [];
+
+  // Use live data if available, otherwise fallback to mock data
+  const displayFeaturedNews =
+    liveFeaturedNews.length > 0 ? liveFeaturedNews : featuredNews;
+  const displayRecentNews =
+    liveRecentNews.length > 0 ? liveRecentNews : recentNews;
 
   return (
     <Layout>
@@ -145,11 +189,21 @@ export const Home: React.FC = () => {
               </Link>
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredNews.map((news) => (
-              <NewsCard key={news.id} news={news} />
-            ))}
-          </div>
+          {newsLoading ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-muted-foreground">Loading news...</div>
+            </div>
+          ) : newsError ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-destructive">Failed to load news</div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {displayFeaturedNews.map((news) => (
+                <NewsCard key={news.id} news={news} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -165,11 +219,23 @@ export const Home: React.FC = () => {
               </Link>
             </Button>
           </div>
-          <div className="space-y-4">
-            {recentNews.map((news) => (
-              <NewsCard key={news.id} news={news} variant="compact" />
-            ))}
-          </div>
+          {newsLoading ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-muted-foreground">
+                Loading latest news...
+              </div>
+            </div>
+          ) : newsError ? (
+            <div className="flex items-center justify-center h-32">
+              <div className="text-destructive">Failed to load latest news</div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {displayRecentNews.map((news) => (
+                <NewsCard key={news.id} news={news} variant="compact" />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </Layout>
