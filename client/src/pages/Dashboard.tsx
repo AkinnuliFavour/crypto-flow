@@ -49,6 +49,30 @@ export const Dashboard: React.FC = () => {
     chartDays: 7,
   });
   const [showSettings, setShowSettings] = useState(false);
+
+  // Currency formatting helper
+  const getCurrencySymbol = (currency: string) => {
+    const symbols: Record<string, string> = {
+      usd: "$",
+      eur: "€",
+      gbp: "£",
+      jpy: "¥",
+      cad: "$",
+      aud: "$",
+    };
+    return symbols[currency.toLowerCase()] || "$";
+  };
+
+  const formatCurrency = (
+    value: number,
+    currency: string = preferences.currency
+  ) => {
+    const symbol = getCurrencySymbol(currency);
+    return `${symbol}${value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  };
   // CoinGecko API hooks
   const {
     data: coinPrices,
@@ -321,7 +345,7 @@ export const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <StatsCard
             title="Portfolio Value"
-            value={portfolioValue}
+            value={formatCurrency(portfolioValue)}
             change={{
               value: portfolioChange,
               label: "24h",
@@ -481,7 +505,7 @@ export const Dashboard: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <div className="text-right">
                           <div className="font-medium text-foreground">
-                            ${item.totalValue.toFixed(2)}
+                            {formatCurrency(item.totalValue)}
                           </div>
                           <div
                             className={`text-sm ${
@@ -490,8 +514,8 @@ export const Dashboard: React.FC = () => {
                                 : "text-destructive"
                             }`}
                           >
-                            {item.gainLoss >= 0 ? "+" : ""}$
-                            {item.gainLoss.toFixed(2)}(
+                            {item.gainLoss >= 0 ? "+" : ""}
+                            {formatCurrency(Math.abs(item.gainLoss))}(
                             {item.gainLossPercent >= 0 ? "+" : ""}
                             {item.gainLossPercent.toFixed(2)}%)
                           </div>
@@ -554,6 +578,7 @@ export const Dashboard: React.FC = () => {
               <Watchlist
                 items={liveWatchlist}
                 onRemoveItem={handleRemoveFromWatchlist}
+                currencySymbol={getCurrencySymbol(preferences.currency)}
               />
             )}
           </div>
