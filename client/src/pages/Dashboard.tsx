@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Layout } from "../components/layout";
 import {
   PriceChart,
@@ -6,14 +6,17 @@ import {
   MarketOverview,
   Watchlist,
   NewsCard,
+  AddToWatchlist,
+  AddToPortfolio,
+  SettingsPanel,
+  ImportExport,
 } from "../components/ui";
 import {
-  // TrendingUp,
-  // DollarSign,
   PieChart,
-  // BarChart3,
   Wallet,
   Target,
+  Settings as SettingsIcon,
+  Trash2,
 } from "lucide-react";
 import {
   mockCryptoData,
@@ -28,8 +31,24 @@ import {
   useTopCryptos,
 } from "../hooks/useCoinGecko";
 import { useCryptoNews } from "../hooks/useNews";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 
 export const Dashboard: React.FC = () => {
+  // Personalization state using local storage
+  const [portfolio, setPortfolio] = useLocalStorage(
+    "crypto-portfolio",
+    mockPortfolio
+  );
+  const [watchlist, setWatchlist] = useLocalStorage(
+    "crypto-watchlist",
+    mockWatchlist
+  );
+  const [preferences, setPreferences] = useLocalStorage("user-preferences", {
+    currency: "usd",
+    newsCategories: ["analysis", "market", "regulation", "technology"],
+    chartDays: 7,
+  });
+  const [showSettings, setShowSettings] = useState(false);
   // CoinGecko API hooks
   const {
     data: coinPrices,
@@ -71,8 +90,8 @@ export const Dashboard: React.FC = () => {
   const { data: solChart } = useCoinChart({ coinId: "solana", days: 7 });
 
   // Extract portfolio and watchlist coin IDs
-  const portfolioCoinIds = mockPortfolio.map((item) => item.cryptoId);
-  const watchlistCoinIds = mockWatchlist.map((item) => item.cryptoId);
+  const portfolioCoinIds = portfolio.map((item) => item.cryptoId);
+  const watchlistCoinIds = watchlist.map((item) => item.cryptoId);
   const allCoinIds = [...new Set([...portfolioCoinIds, ...watchlistCoinIds])];
 
   // Fetch live prices for portfolio and watchlist coins
@@ -82,7 +101,7 @@ export const Dashboard: React.FC = () => {
     error: portfolioWatchlistError,
   } = useCoinPrices({
     coinIds: allCoinIds,
-    vsCurrency: "usd",
+    vsCurrency: preferences.currency,
     refetchInterval: 30000, // Update every 30 seconds
   });
 
@@ -156,7 +175,7 @@ export const Dashboard: React.FC = () => {
     : mockMarketStats;
 
   // Transform portfolio data with live prices
-  const livePortfolio = mockPortfolio.map((item) => {
+  const livePortfolio = portfolio.map((item) => {
     const livePriceData = portfolioWatchlistPrices?.[item.cryptoId];
     const livePrice = livePriceData?.current_price || item.currentPrice;
 
@@ -175,7 +194,7 @@ export const Dashboard: React.FC = () => {
   });
 
   // Transform watchlist data with live prices
-  const liveWatchlist = mockWatchlist.map((item) => {
+  const liveWatchlist = watchlist.map((item) => {
     const livePriceData = portfolioWatchlistPrices?.[item.cryptoId];
     const livePrice = livePriceData?.current_price || item.price;
     const change24h =
@@ -218,7 +237,7 @@ export const Dashboard: React.FC = () => {
         url: article.url,
       }))
       .filter((news) =>
-        mockWatchlist.some((watchItem) => {
+        watchlist.some((watchItem) => {
           const watchlistTerms = [
             watchItem.symbol.toLowerCase(),
             watchItem.name.toLowerCase(),
@@ -229,17 +248,74 @@ export const Dashboard: React.FC = () => {
       )
       .slice(0, 6) || [];
 
+  // Handlers for personalization features
+  const handleAddToWatchlist = (item: (typeof liveWatchlist)[0]) => {
+    setWatchlist([...watchlist, item]);
+  };
+
+  const handleRemoveFromWatchlist = (cryptoId: string) => {
+    if (window.confirm("Remove this item from your watchlist?")) {
+      setWatchlist(watchlist.filter((item) => item.cryptoId !== cryptoId));
+    }
+  };
+
+  const handleAddToPortfolio = (item: (typeof livePortfolio)[0]) => {
+    setPortfolio([...portfolio, item]);
+  };
+
+  const handleRemoveFromPortfolio = (cryptoId: string) => {
+    if (window.confirm("Remove this item from your portfolio?")) {
+      setPortfolio(portfolio.filter((item) => item.cryptoId !== cryptoId));
+    }
+  };
+
+  const handleImport = (data: {
+    portfolio?: typeof portfolio;
+    watchlist?: typeof watchlist;
+  }) => {
+    if (data.portfolio) {
+      setPortfolio(data.portfolio);
+    }
+    if (data.watchlist) {
+      setWatchlist(data.watchlist);
+    }
+  };
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Dashboard</h1>
-          <p className="text-muted-foreground text-lg">
-            Track your portfolio, monitor markets, and stay updated with
-            personalized news.
-          </p>
+        {/* Header with Settings Toggle */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-4">Dashboard</h1>
+            <p className="text-muted-foreground text-lg">
+              Track your portfolio, monitor markets, and stay updated with
+              personalized news.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-accent transition-colors"
+          >
+            <SettingsIcon size={20} />
+            {showSettings ? "Hide" : "Show"} Settings
+          </button>
         </div>
+
+        {/* Settings and Import/Export Section */}
+        {showSettings && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <SettingsPanel
+              preferences={preferences}
+              onUpdate={setPreferences}
+            />
+            <ImportExport
+              portfolioData={portfolio}
+              watchlistData={watchlist}
+              onImport={handleImport}
+            />
+          </div>
+        )}
 
         {/* Portfolio Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -342,7 +418,10 @@ export const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Portfolio */}
           <div>
-            <h2 className="text-2xl font-bold mb-6">Portfolio</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Portfolio</h2>
+              <AddToPortfolio onAdd={handleAddToPortfolio} />
+            </div>
             {portfolioWatchlistLoading ? (
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
@@ -399,22 +478,33 @@ export const Dashboard: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-medium text-foreground">
-                          ${item.totalValue.toFixed(2)}
+                      <div className="flex items-center gap-2">
+                        <div className="text-right">
+                          <div className="font-medium text-foreground">
+                            ${item.totalValue.toFixed(2)}
+                          </div>
+                          <div
+                            className={`text-sm ${
+                              item.gainLoss >= 0
+                                ? "text-[hsl(160,84%,39%)]"
+                                : "text-destructive"
+                            }`}
+                          >
+                            {item.gainLoss >= 0 ? "+" : ""}$
+                            {item.gainLoss.toFixed(2)}(
+                            {item.gainLossPercent >= 0 ? "+" : ""}
+                            {item.gainLossPercent.toFixed(2)}%)
+                          </div>
                         </div>
-                        <div
-                          className={`text-sm ${
-                            item.gainLoss >= 0
-                              ? "text-[hsl(160,84%,39%)]"
-                              : "text-destructive"
-                          }`}
+                        <button
+                          onClick={() =>
+                            handleRemoveFromPortfolio(item.cryptoId)
+                          }
+                          className="p-2 hover:bg-destructive/10 rounded transition-colors"
+                          title="Remove from portfolio"
                         >
-                          {item.gainLoss >= 0 ? "+" : ""}$
-                          {item.gainLoss.toFixed(2)}(
-                          {item.gainLossPercent >= 0 ? "+" : ""}
-                          {item.gainLossPercent.toFixed(2)}%)
-                        </div>
+                          <Trash2 size={16} className="text-destructive" />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -425,7 +515,13 @@ export const Dashboard: React.FC = () => {
 
           {/* Watchlist */}
           <div>
-            <h2 className="text-2xl font-bold mb-6">Watchlist</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Watchlist</h2>
+              <AddToWatchlist
+                currentWatchlist={liveWatchlist}
+                onAdd={handleAddToWatchlist}
+              />
+            </div>
             {portfolioWatchlistLoading ? (
               <div className="space-y-4">
                 {[...Array(4)].map((_, i) => (
@@ -455,7 +551,10 @@ export const Dashboard: React.FC = () => {
                 </p>
               </div>
             ) : (
-              <Watchlist items={liveWatchlist} />
+              <Watchlist
+                items={liveWatchlist}
+                onRemoveItem={handleRemoveFromWatchlist}
+              />
             )}
           </div>
         </div>
