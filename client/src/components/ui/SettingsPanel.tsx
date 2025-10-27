@@ -42,7 +42,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             onChange={(e) =>
               onUpdate({ ...preferences, currency: e.target.value })
             }
-            className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-3 py-2 border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="usd">USD ($)</option>
             <option value="eur">EUR (€)</option>
@@ -66,7 +66,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             onChange={(e) =>
               onUpdate({ ...preferences, chartDays: parseInt(e.target.value) })
             }
-            className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-3 py-2 border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="1">24 Hours</option>
             <option value="7">7 Days</option>
