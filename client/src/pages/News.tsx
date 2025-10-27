@@ -9,6 +9,7 @@ import {
 import { SearchBar } from "../components/layout";
 import type { NewsCategory } from "../types";
 import { useCryptoNews, useSearchNews } from "@/hooks/useNews";
+import { Loader2 } from "lucide-react";
 
 export const News: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -111,6 +112,21 @@ export const News: React.FC = () => {
               the crypto world.
             </p>
           </div>
+
+          {/* Loading Spinner */}
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+            <p className="text-lg font-medium text-muted-foreground">
+              {isSearching
+                ? `Searching for "${searchTerm}"...`
+                : "Loading news..."}
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Fetching the latest cryptocurrency news
+            </p>
+          </div>
+
+          {/* Skeleton loaders */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(itemsPerPage)].map((_, i) => (
               <div key={i} className="animate-pulse bg-muted rounded-lg h-64" />

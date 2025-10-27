@@ -9,6 +9,7 @@ import {
   MessageCircle,
   Bookmark,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 import { Layout } from "../components/layout";
 import { NewsCard, Button } from "../components/ui";
@@ -61,7 +62,20 @@ export const Article: React.FC = () => {
               </Link>
             </Button>
           </div>
-          <div className="animate-pulse">
+
+          {/* Loading Spinner */}
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+            <p className="text-lg font-medium text-muted-foreground">
+              Loading article...
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Please wait while we fetch the content
+            </p>
+          </div>
+
+          {/* Skeleton Loader */}
+          <div className="animate-pulse mt-8">
             <div className="h-8 bg-muted rounded mb-4 w-3/4"></div>
             <div className="h-4 bg-muted rounded mb-2 w-1/2"></div>
             <div className="h-4 bg-muted rounded mb-8 w-1/4"></div>
@@ -192,7 +206,9 @@ export const Article: React.FC = () => {
               {articleData.siteName || "News Article"}
             </span>
             <span className="text-muted-foreground">
-              {articleData.siteName ? `${articleData.siteName} • Crypto News` : "Crypto News"}
+              {articleData.siteName
+                ? `${articleData.siteName} • Crypto News`
+                : "Crypto News"}
             </span>
           </div>
 
@@ -285,15 +301,15 @@ export const Article: React.FC = () => {
             className="text-muted-foreground leading-relaxed"
             dangerouslySetInnerHTML={{
               __html: articleData.content
-                .replace(/\n/g, '<br>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/```(.*?)```/gs, '<pre><code>$1</code></pre>')
-                .replace(/`(.*?)`/g, '<code>$1</code>')
-                .replace(/^\s*[-*+]\s+(.*)$/gm, '<li>$1</li>')
-                .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
-                .replace(/^\d+\.\s+(.*)$/gm, '<li>$1</li>')
-                .replace(/(<li>.*<\/li>)/s, '<ol>$1</ol>')
+                .replace(/\n/g, "<br>")
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                .replace(/\*(.*?)\*/g, "<em>$1</em>")
+                .replace(/```(.*?)```/gs, "<pre><code>$1</code></pre>")
+                .replace(/`(.*?)`/g, "<code>$1</code>")
+                .replace(/^\s*[-*+]\s+(.*)$/gm, "<li>$1</li>")
+                .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>")
+                .replace(/^\d+\.\s+(.*)$/gm, "<li>$1</li>")
+                .replace(/(<li>.*<\/li>)/s, "<ol>$1</ol>"),
             }}
           />
         </div>
