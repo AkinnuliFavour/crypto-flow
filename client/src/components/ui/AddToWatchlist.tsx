@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import { Plus, X, Search } from "lucide-react";
+import { X, Search } from "lucide-react";
 import { useTopCryptos } from "../../hooks/useCoinGecko";
 import type { CryptoData, WatchlistItem } from "../../types";
 
 interface AddToWatchlistProps {
   currentWatchlist: WatchlistItem[];
   onAdd: (item: WatchlistItem) => void;
+  onToggle?: () => void;
 }
 
 export const AddToWatchlist: React.FC<AddToWatchlistProps> = ({
   currentWatchlist,
   onAdd,
+  onToggle,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch top 100 cryptocurrencies to choose from
@@ -45,29 +46,18 @@ export const AddToWatchlist: React.FC<AddToWatchlistProps> = ({
       })
       .slice(0, 10) || [];
 
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-      >
-        <Plus size={16} />
-        Add to Watchlist
-      </button>
-    );
-  }
+  const handleClose = () => {
+    if (onToggle) {
+      onToggle();
+    }
+    setSearchTerm("");
+  };
 
   return (
     <div className="rounded-lg border bg-card p-4 mb-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Add to Watchlist</h3>
-        <button
-          onClick={() => {
-            setIsOpen(false);
-            setSearchTerm("");
-          }}
-          className="p-1 hover:bg-accent rounded"
-        >
+        <button onClick={handleClose} className="p-1 hover:bg-accent rounded">
           <X size={20} />
         </button>
       </div>

@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import { Plus, X, Search } from "lucide-react";
+import { X, Search } from "lucide-react";
 import { useTopCryptos } from "../../hooks/useCoinGecko";
 import type { CryptoData, PortfolioItem } from "../../types";
 
 interface AddToPortfolioProps {
   onAdd: (item: PortfolioItem) => void;
+  onToggle?: () => void;
 }
 
-export const AddToPortfolio: React.FC<AddToPortfolioProps> = ({ onAdd }) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const AddToPortfolio: React.FC<AddToPortfolioProps> = ({
+  onAdd,
+  onToggle,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCoin, setSelectedCoin] = useState<CryptoData | null>(null);
   const [amount, setAmount] = useState("");
@@ -77,32 +80,21 @@ export const AddToPortfolio: React.FC<AddToPortfolioProps> = ({ onAdd }) => {
       })
       .slice(0, 10) || [];
 
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-      >
-        <Plus size={16} />
-        Add to Portfolio
-      </button>
-    );
-  }
+  const handleClose = () => {
+    if (onToggle) {
+      onToggle();
+    }
+    setSelectedCoin(null);
+    setAmount("");
+    setBuyPrice("");
+    setSearchTerm("");
+  };
 
   return (
     <div className="rounded-lg border bg-card p-4 mb-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Add to Portfolio</h3>
-        <button
-          onClick={() => {
-            setIsOpen(false);
-            setSelectedCoin(null);
-            setAmount("");
-            setBuyPrice("");
-            setSearchTerm("");
-          }}
-          className="p-1 hover:bg-accent rounded"
-        >
+        <button onClick={handleClose} className="p-1 hover:bg-accent rounded">
           <X size={20} />
         </button>
       </div>

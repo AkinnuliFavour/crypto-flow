@@ -17,6 +17,7 @@ import {
   Target,
   Settings as SettingsIcon,
   Trash2,
+  Plus,
 } from "lucide-react";
 import {
   mockCryptoData,
@@ -49,6 +50,8 @@ export const Dashboard: React.FC = () => {
     chartDays: 7,
   });
   const [showSettings, setShowSettings] = useState(false);
+  const [showAddToWatchlist, setShowAddToWatchlist] = useState(false);
+  const [showAddToPortfolio, setShowAddToPortfolio] = useState(false);
 
   // Currency formatting helper
   const getCurrencySymbol = (currency: string) => {
@@ -444,8 +447,23 @@ export const Dashboard: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Portfolio</h2>
-              <AddToPortfolio onAdd={handleAddToPortfolio} />
+              {!showAddToPortfolio && (
+                <button
+                  onClick={() => setShowAddToPortfolio(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  <Plus size={16} />
+                  Add to Portfolio
+                </button>
+              )}
             </div>
+
+            {showAddToPortfolio && (
+              <AddToPortfolio
+                onAdd={handleAddToPortfolio}
+                onToggle={() => setShowAddToPortfolio(!showAddToPortfolio)}
+              />
+            )}
             {portfolioWatchlistLoading ? (
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
@@ -541,11 +559,24 @@ export const Dashboard: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Watchlist</h2>
+              {!showAddToWatchlist && (
+                <button
+                  onClick={() => setShowAddToWatchlist(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  <Plus size={16} />
+                  Add to Watchlist
+                </button>
+              )}
+            </div>
+
+            {showAddToWatchlist && (
               <AddToWatchlist
                 currentWatchlist={liveWatchlist}
                 onAdd={handleAddToWatchlist}
+                onToggle={() => setShowAddToWatchlist(!showAddToWatchlist)}
               />
-            </div>
+            )}
             {portfolioWatchlistLoading ? (
               <div className="space-y-4">
                 {[...Array(4)].map((_, i) => (
