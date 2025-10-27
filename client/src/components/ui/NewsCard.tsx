@@ -20,6 +20,21 @@ export const NewsCard: React.FC<NewsCardProps> = ({
     }).format(date);
   };
 
+  // Fallback image if imageUrl is missing or invalid
+  const getImageUrl = () => {
+    if (!news.imageUrl || news.imageUrl.trim() === "") {
+      // Use a gradient as fallback
+      return "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop&q=60";
+    }
+    return news.imageUrl;
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    // Fallback if image fails to load
+    e.currentTarget.src =
+      "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop&q=60";
+  };
+
   // Create article link - use URL if available (API data), otherwise use ID (mock data)
   const getArticleLink = () => {
     // Check if this is API data with a url property
@@ -49,10 +64,11 @@ export const NewsCard: React.FC<NewsCardProps> = ({
     return (
       <article className="group relative overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/20 card-hover-glow">
         <Link to={getArticleLink()}>
-          <div className="aspect-[16/9] overflow-hidden">
+          <div className="aspect-[16/9] overflow-hidden bg-muted">
             <img
-              src={news.imageUrl}
+              src={getImageUrl()}
               alt={news.title}
+              onError={handleImageError}
               className="h-full w-full object-cover transition-transform group-hover:scale-105"
             />
           </div>
@@ -134,10 +150,11 @@ export const NewsCard: React.FC<NewsCardProps> = ({
   return (
     <article className="group overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/20 card-hover-glow">
       <Link to={getArticleLink()}>
-        <div className="aspect-[16/9] overflow-hidden">
+        <div className="aspect-[16/9] overflow-hidden bg-muted">
           <img
-            src={news.imageUrl}
+            src={getImageUrl()}
             alt={news.title}
+            onError={handleImageError}
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
           />
         </div>
