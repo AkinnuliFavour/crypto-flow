@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { newsService } from "../services/news.services";
 import { ErrorResponse, ArticleDetailsResponse } from "../types/news.types";
 
-const router = Router();
+const router: Router = Router();
 
 // Get crypto news headlines
 router.get("/crypto", async (req: Request, res: Response) => {
