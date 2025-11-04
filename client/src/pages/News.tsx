@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Layout } from "../components/layout";
+import { SEO } from "../components/SEO";
 import {
   NewsCard,
   CategoryTabs,
@@ -104,6 +105,18 @@ export const News: React.FC = () => {
   if (loading) {
     return (
       <Layout>
+        <SEO
+          title="Cryptocurrency News - CryptoFlow | Latest Crypto News & Updates"
+          description="Stay updated with the latest cryptocurrency news, market analysis, and insights. Real-time news from top crypto sources."
+          keywords={[
+            "cryptocurrency news",
+            "crypto news",
+            "bitcoin news",
+            "ethereum news",
+            "blockchain news",
+            "crypto market analysis",
+          ]}
+        />
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-4">Cryptocurrency News</h1>
@@ -140,6 +153,18 @@ export const News: React.FC = () => {
   if (hasError) {
     return (
       <Layout>
+        <SEO
+          title="Cryptocurrency News - CryptoFlow | Latest Crypto News & Updates"
+          description="Stay updated with the latest cryptocurrency news, market analysis, and insights. Real-time news from top crypto sources."
+          keywords={[
+            "cryptocurrency news",
+            "crypto news",
+            "bitcoin news",
+            "ethereum news",
+            "blockchain news",
+            "crypto market analysis",
+          ]}
+        />
         <div className="container mx-auto px-4 py-8 text-center">
           <h1 className="text-2xl font-bold mb-4">Error Loading News</h1>
           <p className="text-muted-foreground mb-6">
@@ -158,6 +183,18 @@ export const News: React.FC = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Cryptocurrency News - CryptoFlow | Latest Crypto News & Updates"
+        description="Stay updated with the latest cryptocurrency news, market analysis, and insights. Real-time news from top crypto sources."
+        keywords={[
+          "cryptocurrency news",
+          "crypto news",
+          "bitcoin news",
+          "ethereum news",
+          "blockchain news",
+          "crypto market analysis",
+        ]}
+      />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { HelmetProvider } from "react-helmet-async";
 import { queryClient } from "./lib/queryClient";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -30,39 +31,41 @@ import "./App.css";
 function App() {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <Router>
-            <div className="App">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/news" element={<News />} />
-                <Route path="/news/:id" element={<Article />} />
-                <Route path="/article/*" element={<Article />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                {/* 404 route */}
-                <Route
-                  path="*"
-                  element={
-                    <div className="min-h-screen flex items-center justify-center">
-                      <div className="text-center">
-                        <h1 className="text-4xl font-bold mb-4">404</h1>
-                        <p className="text-muted-foreground mb-6">
-                          Page not found
-                        </p>
-                        <a href="/" className="text-primary hover:underline">
-                          Go back home
-                        </a>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <Router>
+              <div className="App">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/news" element={<News />} />
+                  <Route path="/news/:id" element={<Article />} />
+                  <Route path="/article/*" element={<Article />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  {/* 404 route */}
+                  <Route
+                    path="*"
+                    element={
+                      <div className="min-h-screen flex items-center justify-center">
+                        <div className="text-center">
+                          <h1 className="text-4xl font-bold mb-4">404</h1>
+                          <p className="text-muted-foreground mb-6">
+                            Page not found
+                          </p>
+                          <a href="/" className="text-primary hover:underline">
+                            Go back home
+                          </a>
+                        </div>
                       </div>
-                    </div>
-                  }
-                />
-              </Routes>
-            </div>
-          </Router>
-        </ThemeProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
+                    }
+                  />
+                </Routes>
+              </div>
+            </Router>
+          </ThemeProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </HelmetProvider>
     </ErrorBoundary>
   );
 }

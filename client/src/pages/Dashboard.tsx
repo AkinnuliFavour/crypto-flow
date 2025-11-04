@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Layout } from "../components/layout";
+import { SEO } from "../components/SEO";
 import {
   PriceChart,
   StatsCard,
@@ -310,6 +311,16 @@ export const Dashboard: React.FC = () => {
 
   return (
     <Layout>
+      <SEO
+        title="Dashboard - CryptoFlow | Track Your Portfolio & Watchlist"
+        description="Manage your cryptocurrency portfolio, track your watchlist, and monitor real-time market data. Personalized dashboard for crypto investors."
+        keywords={[
+          "crypto dashboard",
+          "portfolio tracker",
+          "cryptocurrency watchlist",
+          "crypto portfolio management",
+        ]}
+      />
       <div className="container mx-auto px-4 py-8">
         {/* Header with Settings Toggle */}
         <div className="mb-8 flex items-center justify-between">

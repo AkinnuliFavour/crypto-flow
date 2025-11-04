@@ -9,6 +9,9 @@ import {
 } from "lucide-react";
 import { Layout } from "../components/layout";
 import { NewsCard, PriceTicker, StatsCard, Button } from "../components/ui";
+import { SEO } from "../components/SEO";
+import { StructuredData } from "../components/StructuredData";
+import { websiteSchema } from "../lib/schemas";
 import { mockNewsArticles } from "../data/mockData";
 import { useTopCryptos, useGlobalMarketStats } from "../hooks/useCoinGecko";
 import { useCryptoNews } from "../hooks/useNews";
@@ -74,6 +77,8 @@ export const Home: React.FC = () => {
 
   return (
     <Layout>
+      <SEO />
+      <StructuredData data={websiteSchema} />
       {/* Hero Section */}
       <section className="py-12 md:py-20">
         <div className="container mx-auto px-4">

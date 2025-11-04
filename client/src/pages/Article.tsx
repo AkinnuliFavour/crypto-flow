@@ -12,6 +12,9 @@ import {
 } from "lucide-react";
 import { Layout } from "../components/layout";
 import { NewsCard, Button } from "../components/ui";
+import { SEO } from "../components/SEO";
+import { StructuredData } from "../components/StructuredData";
+import { createArticleSchema } from "../lib/schemas";
 import { useArticleDetails, useCryptoNews } from "../hooks/useNews";
 
 export const Article: React.FC = () => {
@@ -36,6 +39,10 @@ export const Article: React.FC = () => {
   if (!urlParam || !articleUrl) {
     return (
       <Layout>
+        <SEO
+          title="Article Not Found - CryptoFlow"
+          description="The cryptocurrency news article you're looking for could not be found."
+        />
         <div className="container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Invalid Article URL</h1>
           <p className="text-muted-foreground mb-6">
@@ -52,6 +59,10 @@ export const Article: React.FC = () => {
   if (isLoading) {
     return (
       <Layout>
+        <SEO
+          title="Loading Article - CryptoFlow"
+          description="Loading cryptocurrency news article..."
+        />
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="mb-6">
             <Button variant="ghost" asChild className="mb-4">
@@ -93,6 +104,10 @@ export const Article: React.FC = () => {
   if (isError || !articleData) {
     return (
       <Layout>
+        <SEO
+          title="Article Not Found - CryptoFlow"
+          description="The cryptocurrency news article you're looking for could not be found."
+        />
         <div className="container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
           <p className="text-muted-foreground mb-6">
@@ -157,8 +172,31 @@ export const Article: React.FC = () => {
     }
   };
 
+  // Create structured data for the article
+  const articleSchema = createArticleSchema({
+    title: articleData.title,
+    description: articleData.description || articleData.title,
+    publishedAt: articleData.publishedAt || new Date().toISOString(),
+    url: window.location.href,
+    image: articleData.image,
+    author: articleData.author,
+  });
+
   return (
     <Layout>
+      <SEO
+        title={`${articleData.title} - CryptoFlow`}
+        description={articleData.description || articleData.title}
+        image={articleData.image}
+        type="article"
+        keywords={[
+          "cryptocurrency",
+          "crypto news",
+          "blockchain",
+          articleData.siteName || "news",
+        ]}
+      />
+      <StructuredData data={articleSchema} />
       <article className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Back Button */}
         <div className="mb-6">
