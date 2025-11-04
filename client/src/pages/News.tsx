@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Layout } from "../components/layout";
+import { SEO } from "../components/SEO";
 import {
   NewsCard,
   CategoryTabs,
@@ -8,136 +9,192 @@ import {
 } from "../components/ui";
 import { SearchBar } from "../components/layout";
 import type { NewsCategory } from "../types";
-import { mockNewsArticles } from "../data/mockData";
+import { useCryptoNews, useSearchNews } from "@/hooks/useNews";
+import { Loader2 } from "lucide-react";
 
 export const News: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState<NewsCategory>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "popular">(
     "newest"
   );
+  const [isSearching, setIsSearching] = useState(false);
 
   const itemsPerPage = 12;
 
-  // Filter and search news
-  const filteredNews = useMemo(() => {
-    let filtered = mockNewsArticles;
+  // Use search API when there's a search term, otherwise use crypto news API
+  const {
+    data: newsData,
+    isLoading,
+    isError,
+    error,
+  } = useCryptoNews(currentPage, itemsPerPage);
 
-    // Filter by category
-    if (activeCategory !== "all") {
-      filtered = filtered.filter((news) => news.category === activeCategory);
-    }
+  const {
+    data: searchData,
+    isLoading: isSearchLoading,
+    isError: isSearchError,
+    error: searchError,
+  } = useSearchNews(searchTerm, currentPage, itemsPerPage, isSearching);
 
-    // Filter by search term
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (news) =>
-          news.title.toLowerCase().includes(term) ||
-          news.excerpt.toLowerCase().includes(term) ||
-          news.tags.some((tag) => tag.toLowerCase().includes(term))
-      );
-    }
+  // Determine which data to use
+  const data = isSearching && searchData ? searchData : newsData;
+  const loading = isSearching ? isSearchLoading : isLoading;
+  const hasError = isSearching ? isSearchError : isError;
+  const currentError = isSearching ? searchError : error;
 
-    // Sort
-    filtered.sort((a, b) => {
+  // Transform API data to match component expectations
+  const transformedArticles = useMemo(() => {
+    if (!data?.articles) return [];
+
+    return data.articles.map((article, index) => ({
+      id: article.url || `article-${index}`,
+      title: article.title,
+      excerpt: article.description || "",
+      content: article.content || "Content not available",
+      imageUrl: article.urlToImage || "/placeholder-news.jpg",
+      source: article.source.name,
+      author: article.author || "Unknown Author",
+      publishedAt: new Date(article.publishedAt),
+      category: "bitcoin" as const, // Default category since API doesn't provide this
+      tags: [], // API doesn't provide tags
+      readTime: Math.max(1, Math.floor((article.content?.length || 0) / 200)), // Estimate read time
+      url: article.url, // Add URL for proper linking
+    }));
+  }, [data]);
+
+  // Sort articles
+  const sortedArticles = useMemo(() => {
+    const articles = [...transformedArticles];
+    articles.sort((a, b) => {
       switch (sortBy) {
         case "newest":
-          return (
-            new Date(b.publishedAt).getTime() -
-            new Date(a.publishedAt).getTime()
-          );
+          return b.publishedAt.getTime() - a.publishedAt.getTime();
         case "oldest":
-          return (
-            new Date(a.publishedAt).getTime() -
-            new Date(b.publishedAt).getTime()
-          );
+          return a.publishedAt.getTime() - b.publishedAt.getTime();
         case "popular":
-          // Mock popularity based on read time (longer = more popular)
           return b.readTime - a.readTime;
         default:
           return 0;
       }
     });
+    return articles;
+  }, [transformedArticles, sortBy]);
 
-    return filtered;
-  }, [activeCategory, searchTerm, sortBy]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
-  const paginatedNews = filteredNews.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const totalResults = data?.totalResults || 0;
+  const totalPages = Math.ceil(totalResults / itemsPerPage);
 
   const handleSearch = (query: string) => {
     setSearchTerm(query);
     setCurrentPage(1);
-  };
-
-  const handleCategoryChange = (category: NewsCategory) => {
-    setActiveCategory(category);
-    setCurrentPage(1);
+    setIsSearching(query.trim().length > 0);
   };
 
   const clearFilters = () => {
-    setActiveCategory("all");
     setSearchTerm("");
     setSortBy("newest");
     setCurrentPage(1);
+    setIsSearching(false);
   };
 
-  const categoryCounts = mockNewsArticles.reduce((acc, news) => {
-    acc[news.category] = (acc[news.category] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
+  // Simplified categories since API doesn't provide category filtering
   const categories = [
-    {
-      value: "all" as NewsCategory,
-      label: "All News",
-      count: mockNewsArticles.length,
-    },
-    {
-      value: "breaking" as NewsCategory,
-      label: "Breaking",
-      count: categoryCounts.breaking || 0,
-    },
-    {
-      value: "bitcoin" as NewsCategory,
-      label: "Bitcoin",
-      count: categoryCounts.bitcoin || 0,
-    },
-    {
-      value: "altcoin" as NewsCategory,
-      label: "Altcoins",
-      count: categoryCounts.altcoin || 0,
-    },
-    {
-      value: "defi" as NewsCategory,
-      label: "DeFi & NFTs",
-      count: categoryCounts.defi || 0,
-    },
-    {
-      value: "regulation" as NewsCategory,
-      label: "Regulation",
-      count: categoryCounts.regulation || 0,
-    },
-    {
-      value: "technology" as NewsCategory,
-      label: "Technology",
-      count: categoryCounts.technology || 0,
-    },
-    {
-      value: "analysis" as NewsCategory,
-      label: "Analysis",
-      count: categoryCounts.analysis || 0,
-    },
+    { value: "all" as NewsCategory, label: "All News", count: totalResults },
   ];
+
+  if (loading) {
+    return (
+      <Layout>
+        <SEO
+          title="Cryptocurrency News - CryptoFlow | Latest Crypto News & Updates"
+          description="Stay updated with the latest cryptocurrency news, market analysis, and insights. Real-time news from top crypto sources."
+          keywords={[
+            "cryptocurrency news",
+            "crypto news",
+            "bitcoin news",
+            "ethereum news",
+            "blockchain news",
+            "crypto market analysis",
+          ]}
+        />
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-4">Cryptocurrency News</h1>
+            <p className="text-muted-foreground text-lg">
+              Stay informed with the latest news, analysis, and insights from
+              the crypto world.
+            </p>
+          </div>
+
+          {/* Loading Spinner */}
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+            <p className="text-lg font-medium text-muted-foreground">
+              {isSearching
+                ? `Searching for "${searchTerm}"...`
+                : "Loading news..."}
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Fetching the latest cryptocurrency news
+            </p>
+          </div>
+
+          {/* Skeleton loaders */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(itemsPerPage)].map((_, i) => (
+              <div key={i} className="animate-pulse bg-muted rounded-lg h-64" />
+            ))}
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <Layout>
+        <SEO
+          title="Cryptocurrency News - CryptoFlow | Latest Crypto News & Updates"
+          description="Stay updated with the latest cryptocurrency news, market analysis, and insights. Real-time news from top crypto sources."
+          keywords={[
+            "cryptocurrency news",
+            "crypto news",
+            "bitcoin news",
+            "ethereum news",
+            "blockchain news",
+            "crypto market analysis",
+          ]}
+        />
+        <div className="container mx-auto px-4 py-8 text-center">
+          <h1 className="text-2xl font-bold mb-4">Error Loading News</h1>
+          <p className="text-muted-foreground mb-6">
+            {currentError?.message || "Failed to load news articles"}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            Try Again
+          </button>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
+      <SEO
+        title="Cryptocurrency News - CryptoFlow | Latest Crypto News & Updates"
+        description="Stay updated with the latest cryptocurrency news, market analysis, and insights. Real-time news from top crypto sources."
+        keywords={[
+          "cryptocurrency news",
+          "crypto news",
+          "bitcoin news",
+          "ethereum news",
+          "blockchain news",
+          "crypto market analysis",
+        ]}
+      />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -156,20 +213,11 @@ export const News: React.FC = () => {
           />
 
           {/* Active Filters */}
-          {(activeCategory !== "all" || searchTerm || sortBy !== "newest") && (
+          {(searchTerm || sortBy !== "newest") && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm text-muted-foreground">
                 Active filters:
               </span>
-              {activeCategory !== "all" && (
-                <FilterChip
-                  label={`Category: ${
-                    categories.find((c) => c.value === activeCategory)?.label
-                  }`}
-                  value={activeCategory}
-                  onRemove={() => setActiveCategory("all")}
-                />
-              )}
               {searchTerm && (
                 <FilterChip
                   label={`Search: "${searchTerm}"`}
@@ -218,25 +266,26 @@ export const News: React.FC = () => {
           </div>
         </div>
 
-        {/* Category Tabs */}
+        {/* Category Tabs - Simplified since API doesn't support categories */}
         <CategoryTabs
-          activeCategory={activeCategory}
-          onCategoryChange={handleCategoryChange}
+          activeCategory="all"
+          onCategoryChange={() => {}}
           categories={categories}
         />
 
         {/* Results Count */}
         <div className="mb-6">
           <p className="text-muted-foreground">
-            Showing {paginatedNews.length} of {filteredNews.length} articles
+            Showing {sortedArticles.length} of {totalResults} articles
+            {isSearching && searchTerm && ` for "${searchTerm}"`}
           </p>
         </div>
 
         {/* News Grid */}
-        {paginatedNews.length > 0 ? (
+        {sortedArticles.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {paginatedNews.map((news) => (
+              {sortedArticles.map((news) => (
                 <NewsCard key={news.id} news={news} />
               ))}
             </div>
@@ -253,14 +302,18 @@ export const News: React.FC = () => {
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg mb-4">
-              No news articles found matching your criteria.
+              {isSearching
+                ? `No news articles found for "${searchTerm}".`
+                : "No news articles available."}
             </p>
-            <button
-              onClick={clearFilters}
-              className="text-primary hover:underline"
-            >
-              Clear filters and try again
-            </button>
+            {isSearching && (
+              <button
+                onClick={clearFilters}
+                className="text-primary hover:underline"
+              >
+                Clear search and try again
+              </button>
+            )}
           </div>
         )}
       </div>

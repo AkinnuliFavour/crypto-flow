@@ -7,17 +7,18 @@ interface WatchlistProps {
   items: WatchlistItem[];
   onItemClick?: (cryptoId: string) => void;
   onRemoveItem?: (cryptoId: string) => void;
+  currencySymbol?: string;
 }
 
 export const Watchlist: React.FC<WatchlistProps> = ({
   items,
   onItemClick,
   onRemoveItem,
+  currencySymbol = "$",
 }) => {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+      style: "decimal",
       minimumFractionDigits: 2,
       maximumFractionDigits: 6,
     }).format(price);
@@ -25,9 +26,9 @@ export const Watchlist: React.FC<WatchlistProps> = ({
 
   if (items.length === 0) {
     return (
-      <div className="rounded-lg border bg-card p-6 text-center">
+      <div className="rounded-lg border bg-card p-6 text-center shadow-sm">
         <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <h3 className="font-medium mb-2">No Watchlist Items</h3>
+        <h3 className="font-medium text-foreground mb-2">No Watchlist Items</h3>
         <p className="text-sm text-muted-foreground">
           Add cryptocurrencies to your watchlist to track their performance.
         </p>
@@ -36,10 +37,10 @@ export const Watchlist: React.FC<WatchlistProps> = ({
   }
 
   return (
-    <div className="rounded-lg border bg-card">
+    <div className="rounded-lg border bg-card shadow-sm">
       <div className="p-4 border-b">
-        <h3 className="font-semibold flex items-center space-x-2">
-          <Star className="h-5 w-5" />
+        <h3 className="font-semibold text-foreground flex items-center space-x-2">
+          <Star className="h-5 w-5 text-primary" />
           <span>Watchlist</span>
         </h3>
       </div>
@@ -48,7 +49,7 @@ export const Watchlist: React.FC<WatchlistProps> = ({
         {items.map((item) => (
           <div
             key={item.cryptoId}
-            className="p-4 hover:bg-accent/50 transition-colors cursor-pointer"
+            className="group p-4 hover:bg-accent/50 transition-colors cursor-pointer"
             onClick={() => onItemClick?.(item.cryptoId)}
           >
             <div className="flex items-center justify-between">
@@ -59,7 +60,9 @@ export const Watchlist: React.FC<WatchlistProps> = ({
                   className="h-8 w-8 rounded-full"
                 />
                 <div>
-                  <h4 className="font-medium text-sm">{item.name}</h4>
+                  <h4 className="font-medium text-sm text-foreground">
+                    {item.name}
+                  </h4>
                   <p className="text-xs text-muted-foreground uppercase">
                     {item.symbol}
                   </p>
@@ -67,12 +70,15 @@ export const Watchlist: React.FC<WatchlistProps> = ({
               </div>
 
               <div className="text-right">
-                <div className="font-medium text-sm">
+                <div className="font-medium text-sm text-foreground">
+                  {currencySymbol}
                   {formatPrice(item.price)}
                 </div>
                 <div
                   className={`text-xs flex items-center space-x-1 ${
-                    item.change24h >= 0 ? "text-green-600" : "text-red-600"
+                    item.change24h >= 0
+                      ? "text-[hsl(160,84%,39%)]"
+                      : "text-destructive"
                   }`}
                 >
                   {item.change24h >= 0 ? (

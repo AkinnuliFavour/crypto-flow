@@ -7,10 +7,10 @@
     "shared"
   ],
   "scripts": {
-    "dev": "npm run --workspace=client dev",
-    "build": "npm run --workspace=client build",
-    "lint": "npm run --workspaces lint",
-    "type-check": "npm run --workspaces type-check"
+    "dev": "pnpm --filter client run dev",
+    "build": "pnpm --filter client run build",
+    "lint": "pnpm --recursive run lint",
+    "type-check": "pnpm --recursive run type-check"
   },
   "devDependencies": {
     "typescript": "~5.8.3"

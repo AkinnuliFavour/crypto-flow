@@ -13,3 +13,8 @@ export { CategoryTabs } from "./CategoryTabs";
 export { TrendingTopics } from "./TrendingTopics";
 export { MarketOverview } from "./MarketOverview";
 export { Watchlist } from "./Watchlist";
+export { CoinGeckoExample } from "./CoinGeckoExample";
+export { AddToWatchlist } from "./AddToWatchlist";
+export { AddToPortfolio } from "./AddToPortfolio";
+export { SettingsPanel } from "./SettingsPanel";
+export { ImportExport } from "./ImportExport";

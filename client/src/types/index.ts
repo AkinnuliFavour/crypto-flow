@@ -17,6 +17,7 @@ export interface NewsArticle {
     | "analysis";
   tags: string[];
   readTime: number;
+  url?: string; // Optional URL for API data navigation
 }
 
 export interface CryptoData {

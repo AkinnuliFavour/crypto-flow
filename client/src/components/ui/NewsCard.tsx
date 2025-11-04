@@ -20,27 +20,55 @@ export const NewsCard: React.FC<NewsCardProps> = ({
     }).format(date);
   };
 
+  // Fallback image if imageUrl is missing or invalid
+  const getImageUrl = () => {
+    if (!news.imageUrl || news.imageUrl.trim() === "") {
+      // Use a gradient as fallback
+      return "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop&q=60";
+    }
+    return news.imageUrl;
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    // Fallback if image fails to load
+    e.currentTarget.src =
+      "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop&q=60";
+  };
+
+  // Create article link - use URL if available (API data), otherwise use ID (mock data)
+  const getArticleLink = () => {
+    // Check if this is API data with a url property
+    if ("url" in news && typeof news.url === "string" && news.url) {
+      // For API data with URLs, encode the URL as base64
+      const encodedUrl = btoa(encodeURIComponent(news.url));
+      return `/article/${encodedUrl}`;
+    }
+    // For mock data with IDs
+    return `/news/${news.id}`;
+  };
+
   const getCategoryColor = (category: string) => {
     const colors = {
-      breaking: "bg-red-500",
-      bitcoin: "bg-orange-500",
-      altcoin: "bg-blue-500",
-      defi: "bg-purple-500",
-      regulation: "bg-green-500",
-      technology: "bg-indigo-500",
-      analysis: "bg-gray-500",
+      breaking: "bg-destructive",
+      bitcoin: "bg-[hsl(45,93%,47%)]", // Gold color
+      altcoin: "bg-primary",
+      defi: "bg-[hsl(262,83%,58%)]", // Purple color
+      regulation: "bg-[hsl(160,84%,39%)]", // Green color
+      technology: "bg-primary",
+      analysis: "bg-[hsl(188,95%,42%)]", // Cyan color
     };
-    return colors[category as keyof typeof colors] || "bg-gray-500";
+    return colors[category as keyof typeof colors] || "bg-muted";
   };
 
   if (variant === "featured") {
     return (
-      <article className="group relative overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md">
-        <Link to={`/news/${news.id}`}>
-          <div className="aspect-[16/9] overflow-hidden">
+      <article className="group relative overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/20 card-hover-glow">
+        <Link to={getArticleLink()}>
+          <div className="aspect-[16/9] overflow-hidden bg-muted">
             <img
-              src={news.imageUrl}
+              src={getImageUrl()}
               alt={news.title}
+              onError={handleImageError}
               className="h-full w-full object-cover transition-transform group-hover:scale-105"
             />
           </div>
@@ -57,7 +85,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
                 {news.source}
               </span>
             </div>
-            <h3 className="text-xl font-bold leading-tight mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+            <h3 className="text-xl font-bold leading-tight mb-3 line-clamp-2 group-hover:text-primary transition-colors text-foreground">
               {news.title}
             </h3>
             <p className="text-muted-foreground mb-4 line-clamp-3">
@@ -85,7 +113,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
   if (variant === "compact") {
     return (
       <article className="group flex space-x-4 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
-        <Link to={`/news/${news.id}`} className="flex-1">
+        <Link to={getArticleLink()} className="flex-1">
           <div className="flex items-start space-x-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-2">
@@ -101,7 +129,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
                   {news.source}
                 </span>
               </div>
-              <h3 className="text-sm font-semibold leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+              <h3 className="text-sm font-semibold leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors text-foreground">
                 {news.title}
               </h3>
               <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
@@ -120,12 +148,13 @@ export const NewsCard: React.FC<NewsCardProps> = ({
 
   // Default variant
   return (
-    <article className="group overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md">
-      <Link to={`/news/${news.id}`}>
-        <div className="aspect-[16/9] overflow-hidden">
+    <article className="group overflow-hidden rounded-lg border bg-card shadow-sm transition-all hover:shadow-md hover:border-primary/20 card-hover-glow">
+      <Link to={getArticleLink()}>
+        <div className="aspect-[16/9] overflow-hidden bg-muted">
           <img
-            src={news.imageUrl}
+            src={getImageUrl()}
             alt={news.title}
+            onError={handleImageError}
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
           />
         </div>
@@ -140,7 +169,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
             </span>
             <span className="text-sm text-muted-foreground">{news.source}</span>
           </div>
-          <h3 className="text-lg font-semibold leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="text-lg font-semibold leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors text-foreground">
             {news.title}
           </h3>
           <p className="text-sm text-muted-foreground mb-3 line-clamp-2">

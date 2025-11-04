@@ -6,29 +6,47 @@ import {
   User,
   Share2,
   Heart,
-  MessageCircle,
   Bookmark,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
 import { Layout } from "../components/layout";
 import { NewsCard, Button } from "../components/ui";
-import { mockNewsArticles } from "../data/mockData";
+import { SEO } from "../components/SEO";
+import { StructuredData } from "../components/StructuredData";
+import { createArticleSchema } from "../lib/schemas";
+import { useArticleDetails, useCryptoNews } from "../hooks/useNews";
 
 export const Article: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { "*": urlParam } = useParams<{ "*": string }>();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [likes] = useState(42);
   const [isLiked, setIsLiked] = useState(false);
 
-  const article = mockNewsArticles.find((news) => news.id === id);
+  // Decode the URL parameter (it should be a base64 encoded URL)
+  const articleUrl = urlParam ? decodeURIComponent(atob(urlParam)) : null;
 
-  if (!article) {
+  const {
+    data: articleData,
+    isLoading,
+    isError,
+    error,
+  } = useArticleDetails(articleUrl);
+
+  // Get related articles from crypto news API
+  const { data: relatedNewsData } = useCryptoNews(1, 6);
+
+  if (!urlParam || !articleUrl) {
     return (
       <Layout>
+        <SEO
+          title="Article Not Found - CryptoFlow"
+          description="The cryptocurrency news article you're looking for could not be found."
+        />
         <div className="container mx-auto px-4 py-12 text-center">
-          <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
+          <h1 className="text-2xl font-bold mb-4">Invalid Article URL</h1>
           <p className="text-muted-foreground mb-6">
-            The article you're looking for doesn't exist or has been removed.
+            The article URL parameter is missing or invalid.
           </p>
           <Button asChild>
             <Link to="/news">Back to News</Link>
@@ -38,59 +56,114 @@ export const Article: React.FC = () => {
     );
   }
 
-  // Mock related articles (excluding current article)
-  const relatedArticles = mockNewsArticles
-    .filter(
-      (news) =>
-        news.id !== article.id &&
-        (news.category === article.category ||
-          news.tags.some((tag) => article.tags.includes(tag)))
-    )
-    .slice(0, 3);
+  if (isLoading) {
+    return (
+      <Layout>
+        <SEO
+          title="Loading Article - CryptoFlow"
+          description="Loading cryptocurrency news article..."
+        />
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="mb-6">
+            <Button variant="ghost" asChild className="mb-4">
+              <Link to="/news">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to News
+              </Link>
+            </Button>
+          </div>
 
-  // Mock comments
-  const mockComments = [
-    {
-      id: "1",
-      author: "CryptoEnthusiast",
-      content:
-        "Great article! This really helps explain the current market dynamics.",
-      publishedAt: new Date("2024-01-15T14:30:00Z"),
-      likes: 12,
-    },
-    {
-      id: "2",
-      author: "BlockchainDev",
-      content:
-        "I've been following this trend for months. The institutional adoption is definitely accelerating.",
-      publishedAt: new Date("2024-01-15T15:45:00Z"),
-      likes: 8,
-    },
-    {
-      id: "3",
-      author: "MarketWatcher",
-      content:
-        "What are your thoughts on how this will affect retail investors?",
-      publishedAt: new Date("2024-01-15T16:20:00Z"),
-      likes: 5,
-    },
-  ];
+          {/* Loading Spinner */}
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+            <p className="text-lg font-medium text-muted-foreground">
+              Loading article...
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Please wait while we fetch the content
+            </p>
+          </div>
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
+          {/* Skeleton Loader */}
+          <div className="animate-pulse mt-8">
+            <div className="h-8 bg-muted rounded mb-4 w-3/4"></div>
+            <div className="h-4 bg-muted rounded mb-2 w-1/2"></div>
+            <div className="h-4 bg-muted rounded mb-8 w-1/4"></div>
+            <div className="h-64 bg-muted rounded mb-8"></div>
+            <div className="space-y-4">
+              <div className="h-4 bg-muted rounded"></div>
+              <div className="h-4 bg-muted rounded w-5/6"></div>
+              <div className="h-4 bg-muted rounded w-4/6"></div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (isError || !articleData) {
+    return (
+      <Layout>
+        <SEO
+          title="Article Not Found - CryptoFlow"
+          description="The cryptocurrency news article you're looking for could not be found."
+        />
+        <div className="container mx-auto px-4 py-12 text-center">
+          <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
+          <p className="text-muted-foreground mb-6">
+            {error?.message ||
+              "The article you're looking for doesn't exist or couldn't be loaded."}
+          </p>
+          <div className="space-x-4">
+            <Button asChild>
+              <Link to="/news">Back to News</Link>
+            </Button>
+            <Button variant="outline" onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Transform related articles from NewsAPI format to NewsCard format
+  const relatedArticles =
+    relatedNewsData?.articles?.slice(0, 3).map((article) => ({
+      id: article.url,
+      title: article.title,
+      excerpt: article.description || "",
+      content: article.content || "Content not available",
+      imageUrl: article.urlToImage || "/placeholder-news.jpg",
+      source: article.source.name,
+      author: article.author || "Unknown Author",
+      publishedAt: new Date(article.publishedAt),
+      category: "bitcoin" as const,
+      tags: [],
+      readTime: Math.max(1, Math.floor((article.content?.length || 0) / 200)),
+    })) || [];
+
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return "Unknown date";
+    try {
+      const dateObj = new Date(dateString);
+      return new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(dateObj);
+    } catch {
+      return "Invalid date";
+    }
   };
 
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: article.title,
-        text: article.excerpt,
+        title: articleData.title,
+        text: articleData.description || articleData.title,
         url: window.location.href,
       });
     } else {
@@ -99,8 +172,31 @@ export const Article: React.FC = () => {
     }
   };
 
+  // Create structured data for the article
+  const articleSchema = createArticleSchema({
+    title: articleData.title,
+    description: articleData.description || articleData.title,
+    publishedAt: articleData.publishedAt || new Date().toISOString(),
+    url: window.location.href,
+    image: articleData.image,
+    author: articleData.author,
+  });
+
   return (
     <Layout>
+      <SEO
+        title={`${articleData.title} - CryptoFlow`}
+        description={articleData.description || articleData.title}
+        image={articleData.image}
+        type="article"
+        keywords={[
+          "cryptocurrency",
+          "crypto news",
+          "blockchain",
+          articleData.siteName || "news",
+        ]}
+      />
+      <StructuredData data={articleSchema} />
       <article className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Back Button */}
         <div className="mb-6">
@@ -115,49 +211,53 @@ export const Article: React.FC = () => {
         {/* Article Header */}
         <header className="mb-8">
           <div className="flex items-center space-x-2 mb-4">
-            <span
-              className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium text-white ${
-                article.category === "breaking"
-                  ? "bg-red-500"
-                  : article.category === "bitcoin"
-                  ? "bg-orange-500"
-                  : article.category === "altcoin"
-                  ? "bg-blue-500"
-                  : article.category === "defi"
-                  ? "bg-purple-500"
-                  : article.category === "regulation"
-                  ? "bg-green-500"
-                  : article.category === "technology"
-                  ? "bg-indigo-500"
-                  : "bg-gray-500"
-              }`}
-            >
-              {article.category.charAt(0).toUpperCase() +
-                article.category.slice(1)}
+            <span className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium text-white bg-blue-500">
+              {articleData.siteName || "News Article"}
             </span>
-            <span className="text-muted-foreground">{article.source}</span>
+            <span className="text-muted-foreground">
+              {articleData.siteName
+                ? `${articleData.siteName} • Crypto News`
+                : "Crypto News"}
+            </span>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-            {article.title}
+            {articleData.title}
           </h1>
 
-          <p className="text-xl text-muted-foreground mb-6">
-            {article.excerpt}
-          </p>
+          {articleData.description && (
+            <p className="text-xl text-muted-foreground mb-6">
+              {articleData.description}
+            </p>
+          )}
 
           {/* Article Meta */}
           <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y">
             <div className="flex items-center space-x-6 text-sm text-muted-foreground">
-              <div className="flex items-center space-x-2">
-                <User className="h-4 w-4" />
-                <span>{article.author}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4" />
-                <span>{formatDate(article.publishedAt)}</span>
-              </div>
-              <span>{article.readTime} min read</span>
+              {articleData.author && (
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4" />
+                  <span>{articleData.author}</span>
+                </div>
+              )}
+              {articleData.siteName && (
+                <div className="flex items-center space-x-2">
+                  <span className="font-medium">{articleData.siteName}</span>
+                </div>
+              )}
+              {articleData.publishedAt && (
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4" />
+                  <span>{formatDate(articleData.publishedAt)}</span>
+                </div>
+              )}
+              <span>
+                {Math.max(
+                  1,
+                  Math.floor((articleData.content?.length || 0) / 200)
+                )}{" "}
+                min read
+              </span>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -191,31 +291,36 @@ export const Article: React.FC = () => {
         </header>
 
         {/* Article Image */}
-        <div className="mb-8">
-          <img
-            src={article.imageUrl}
-            alt={article.title}
-            className="w-full h-64 md:h-96 object-cover rounded-lg"
-          />
-        </div>
+        {articleData.image && (
+          <div className="mb-8">
+            <img
+              src={articleData.image}
+              alt={articleData.title}
+              className="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          </div>
+        )}
 
         {/* Article Content */}
         <div className="prose prose-lg max-w-none mb-12">
-          <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
-            {article.content}
-          </div>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mt-8 pt-6 border-t">
-            {article.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-sm font-medium text-muted-foreground"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
+          <div
+            className="text-muted-foreground leading-relaxed"
+            dangerouslySetInnerHTML={{
+              __html: articleData.content
+                .replace(/\n/g, "<br>")
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                .replace(/\*(.*?)\*/g, "<em>$1</em>")
+                .replace(/```(.*?)```/gs, "<pre><code>$1</code></pre>")
+                .replace(/`(.*?)`/g, "<code>$1</code>")
+                .replace(/^\s*[-*+]\s+(.*)$/gm, "<li>$1</li>")
+                .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>")
+                .replace(/^\d+\.\s+(.*)$/gm, "<li>$1</li>")
+                .replace(/(<li>.*<\/li>)/s, "<ol>$1</ol>"),
+            }}
+          />
         </div>
 
         {/* Social Sharing */}
@@ -225,7 +330,7 @@ export const Article: React.FC = () => {
             Share Article
           </Button>
           <Button variant="outline" asChild>
-            <a href="#" target="_blank" rel="noopener noreferrer">
+            <a href={articleData.url} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="mr-2 h-4 w-4" />
               View Original
             </a>
@@ -243,70 +348,6 @@ export const Article: React.FC = () => {
             </div>
           </section>
         )}
-
-        {/* Comments Section */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <MessageCircle className="mr-2 h-5 w-5" />
-            Comments ({mockComments.length})
-          </h2>
-
-          {/* Comment Form */}
-          <div className="mb-8">
-            <textarea
-              placeholder="Share your thoughts..."
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-h-[100px] resize-none"
-            />
-            <div className="flex justify-end mt-2">
-              <Button size="sm">Post Comment</Button>
-            </div>
-          </div>
-
-          {/* Comments List */}
-          <div className="space-y-6">
-            {mockComments.map((comment) => (
-              <div key={comment.id} className="border-b pb-6">
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-medium text-primary">
-                      {comment.author.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className="font-medium text-sm">
-                        {comment.author}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDate(comment.publishedAt)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {comment.content}
-                    </p>
-                    <div className="flex items-center space-x-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs"
-                      >
-                        <Heart className="mr-1 h-3 w-3" />
-                        {comment.likes}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs"
-                      >
-                        Reply
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
       </article>
     </Layout>
   );
