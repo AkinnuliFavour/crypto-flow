@@ -6,7 +6,6 @@ import {
   User,
   Share2,
   Heart,
-  MessageCircle,
   Bookmark,
   ExternalLink,
   Loader2,
@@ -128,34 +127,6 @@ export const Article: React.FC = () => {
       tags: [],
       readTime: Math.max(1, Math.floor((article.content?.length || 0) / 200)),
     })) || [];
-
-  // Mock comments
-  const mockComments = [
-    {
-      id: "1",
-      author: "CryptoEnthusiast",
-      content:
-        "Great article! This really helps explain the current market dynamics.",
-      publishedAt: new Date("2024-01-15T14:30:00Z"),
-      likes: 12,
-    },
-    {
-      id: "2",
-      author: "BlockchainDev",
-      content:
-        "I've been following this trend for months. The institutional adoption is definitely accelerating.",
-      publishedAt: new Date("2024-01-15T15:45:00Z"),
-      likes: 8,
-    },
-    {
-      id: "3",
-      author: "MarketWatcher",
-      content:
-        "What are your thoughts on how this will affect retail investors?",
-      publishedAt: new Date("2024-01-15T16:20:00Z"),
-      likes: 5,
-    },
-  ];
 
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "Unknown date";
@@ -339,70 +310,6 @@ export const Article: React.FC = () => {
             </div>
           </section>
         )}
-
-        {/* Comments Section */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <MessageCircle className="mr-2 h-5 w-5" />
-            Comments ({mockComments.length})
-          </h2>
-
-          {/* Comment Form */}
-          <div className="mb-8">
-            <textarea
-              placeholder="Share your thoughts..."
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-h-[100px] resize-none"
-            />
-            <div className="flex justify-end mt-2">
-              <Button size="sm">Post Comment</Button>
-            </div>
-          </div>
-
-          {/* Comments List */}
-          <div className="space-y-6">
-            {mockComments.map((comment) => (
-              <div key={comment.id} className="border-b pb-6">
-                <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-medium text-primary">
-                      {comment.author.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className="font-medium text-sm">
-                        {comment.author}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDate(comment.publishedAt.toISOString())}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {comment.content}
-                    </p>
-                    <div className="flex items-center space-x-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs"
-                      >
-                        <Heart className="mr-1 h-3 w-3" />
-                        {comment.likes}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs"
-                      >
-                        Reply
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
       </article>
     </Layout>
   );
