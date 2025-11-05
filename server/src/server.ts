@@ -7,12 +7,14 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 const app: Express = express();
 
 // Middleware
+// Allow comma-separated list of origins in ALL environments
+const allowedOrigins = config.CORS_ORIGIN.split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin:
-      config.NODE_ENV === "development"
-        ? config.CORS_ORIGIN.split(",").map((origin) => origin.trim())
-        : config.CORS_ORIGIN,
+    origin: allowedOrigins.length > 1 ? allowedOrigins : allowedOrigins[0],
     credentials: true,
   })
 );
