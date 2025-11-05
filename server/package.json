@@ -2,10 +2,11 @@
   "name": "server",
   "version": "1.0.0",
   "main": "dist/server.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
+    "prestart": "pnpm run build",
     "start": "node dist/server.js",
     "lint": "eslint src/**/*.ts",
     "type-check": "tsc --noEmit"
