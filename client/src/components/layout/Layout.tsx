@@ -20,7 +20,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onMenuToggle={toggleSidebar} />
+      <Header onMenuToggle={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <main className="flex-1">{children}</main>
