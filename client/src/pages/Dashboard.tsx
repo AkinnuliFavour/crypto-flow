@@ -543,10 +543,14 @@ export const Dashboard: React.FC = () => {
                                 : "text-destructive"
                             }`}
                           >
-                            {item.gainLoss >= 0 ? "+" : ""}
-                            {formatCurrency(Math.abs(item.gainLoss))}(
-                            {item.gainLossPercent >= 0 ? "+" : ""}
-                            {item.gainLossPercent.toFixed(2)}%)
+                            <span className="inline-block">
+                              {item.gainLoss >= 0 ? "+" : ""}
+                              {formatCurrency(Math.abs(item.gainLoss))}
+                            </span>
+                            <span className="inline-block ml-1">
+                              ({item.gainLossPercent >= 0 ? "+" : ""}
+                              {item.gainLossPercent.toFixed(2)}%)
+                            </span>
                           </div>
                         </div>
                         <button
