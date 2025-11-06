@@ -323,8 +323,8 @@ export const Dashboard: React.FC = () => {
       />
       <div className="container mx-auto px-4 py-8">
         {/* Header with Settings Toggle */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-start items-start sm:justify-between gap-6">
+          <div className="flex-1">
             <h1 className="text-4xl font-bold mb-4">Dashboard</h1>
             <p className="text-muted-foreground text-lg">
               Track your portfolio, monitor markets, and stay updated with
@@ -333,7 +333,7 @@ export const Dashboard: React.FC = () => {
           </div>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-accent transition-colors"
+            className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-accent transition-colors whitespace-nowrap flex-shrink-0 self-center sm:self-start"
           >
             <SettingsIcon size={20} />
             {showSettings ? "Hide" : "Show"} Settings
