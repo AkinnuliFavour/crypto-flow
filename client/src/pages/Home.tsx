@@ -9,6 +9,12 @@ import {
 } from "lucide-react";
 import { Layout } from "../components/layout";
 import { NewsCard, PriceTicker, StatsCard, Button } from "../components/ui";
+import {
+  NewsSkeleton,
+  NewsSkeletonCompact,
+  StatsSkeleton,
+  PriceTickerSkeleton,
+} from "../components/ui/Skeletons";
 import { SEO } from "../components/SEO";
 import { StructuredData } from "../components/StructuredData";
 import { websiteSchema } from "../lib/schemas";
@@ -110,11 +116,7 @@ export const Home: React.FC = () => {
       <section className="py-8 border-y bg-muted/20">
         <div className="container mx-auto px-4">
           {cryptosLoading ? (
-            <div className="flex items-center justify-center h-20">
-              <div className="text-muted-foreground">
-                Loading cryptocurrency data...
-              </div>
-            </div>
+            <PriceTickerSkeleton />
           ) : cryptosError ? (
             <div className="flex items-center justify-center h-20">
               <div className="text-destructive">
@@ -140,10 +142,11 @@ export const Home: React.FC = () => {
             Market Overview
           </h2>
           {marketStatsLoading ? (
-            <div className="flex items-center justify-center h-32">
-              <div className="text-muted-foreground">
-                Loading market data...
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <StatsSkeleton />
+              <StatsSkeleton />
+              <StatsSkeleton />
+              <StatsSkeleton />
             </div>
           ) : marketStatsError ? (
             <div className="flex items-center justify-center h-32">
@@ -195,8 +198,11 @@ export const Home: React.FC = () => {
             </Button>
           </div>
           {newsLoading ? (
-            <div className="flex items-center justify-center h-32">
-              <div className="text-muted-foreground">Loading news...</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <NewsSkeleton />
+              <NewsSkeleton />
+              <NewsSkeleton />
+              <NewsSkeleton />
             </div>
           ) : newsError ? (
             <div className="flex items-center justify-center h-32">
@@ -225,10 +231,13 @@ export const Home: React.FC = () => {
             </Button>
           </div>
           {newsLoading ? (
-            <div className="flex items-center justify-center h-32">
-              <div className="text-muted-foreground">
-                Loading latest news...
-              </div>
+            <div className="space-y-4">
+              <NewsSkeletonCompact />
+              <NewsSkeletonCompact />
+              <NewsSkeletonCompact />
+              <NewsSkeletonCompact />
+              <NewsSkeletonCompact />
+              <NewsSkeletonCompact />
             </div>
           ) : newsError ? (
             <div className="flex items-center justify-center h-32">
