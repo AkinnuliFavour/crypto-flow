@@ -5,6 +5,35 @@ import { HiTrendingUp } from "react-icons/hi";
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const [email, setEmail] = React.useState("");
+  const [subscribeStatus, setSubscribeStatus] = React.useState<
+    "idle" | "success" | "error"
+  >("idle");
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !email.includes("@")) {
+      setSubscribeStatus("error");
+      setTimeout(() => setSubscribeStatus("idle"), 3000);
+      return;
+    }
+
+    // Create mailto link with pre-filled content
+    const subject = encodeURIComponent("Newsletter Subscription Request");
+    const body = encodeURIComponent(
+      `New newsletter subscription request:\n\nEmail: ${email}\n\nPlease add this email to the CryptoFlow newsletter mailing list.`
+    );
+    const mailtoLink = `mailto:oluwasemiloreakinnuli@gmail.com?subject=${subject}&body=${body}`;
+
+    // Open email client
+    window.location.href = mailtoLink;
+
+    // Show success message
+    setSubscribeStatus("success");
+    setEmail("");
+    setTimeout(() => setSubscribeStatus("idle"), 5000);
+  };
 
   return (
     <footer className="border-t bg-background">
@@ -29,14 +58,14 @@ export const Footer: React.FC = () => {
                 <FaTwitter className="h-5 w-5" />
               </a>
               <a
-                href="#"
+                href="https://github.com/AkinnuliFavour"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 aria-label="GitHub"
               >
                 <FaGithub className="h-5 w-5" />
               </a>
               <a
-                href="#"
+                href="mailto:oluwasemiloreakinnuli@gmail.com"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 aria-label="Email"
               >
@@ -124,16 +153,34 @@ export const Footer: React.FC = () => {
             <p className="text-sm text-muted-foreground">
               Get the latest crypto news delivered to your inbox.
             </p>
-            <div className="flex space-x-2">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              />
-              <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
-                Subscribe
-              </button>
-            </div>
+            <form onSubmit={handleSubscribe} className="space-y-2">
+              <div className="flex space-x-2">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+                <button
+                  type="submit"
+                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  Subscribe
+                </button>
+              </div>
+              {subscribeStatus === "success" && (
+                <p className="text-xs text-green-600 dark:text-green-400">
+                  Thank you! Opening your email client to complete subscription.
+                </p>
+              )}
+              {subscribeStatus === "error" && (
+                <p className="text-xs text-red-600 dark:text-red-400">
+                  Please enter a valid email address.
+                </p>
+              )}
+            </form>
           </div>
         </div>
 
