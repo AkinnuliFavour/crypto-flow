@@ -9,6 +9,8 @@ import { Home } from "./pages/Home";
 import { News } from "./pages/News";
 import { Dashboard } from "./pages/Dashboard";
 import { Article } from "./pages/Article";
+import { Terms } from "./pages/Terms";
+import { Privacy } from "./pages/Privacy";
 import "./App.css";
 
 // Create a client
@@ -42,6 +44,8 @@ function App() {
                   <Route path="/news/:id" element={<Article />} />
                   <Route path="/article/*" element={<Article />} />
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
                   {/* 404 route */}
                   <Route
                     path="*"
