@@ -89,7 +89,7 @@ export const Home: React.FC = () => {
       <section className="py-12 md:py-20">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
               Stay Ahead in Crypto
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">

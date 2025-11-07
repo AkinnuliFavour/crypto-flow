@@ -95,7 +95,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-1">
                   <User className="h-4 w-4" />
-                  <span>{news.author}</span>
+                  <span className="font-bold">{news.author}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Clock className="h-4 w-4" />
@@ -136,8 +136,10 @@ export const NewsCard: React.FC<NewsCardProps> = ({
                 {news.excerpt}
               </p>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{news.author}</span>
-                <span>{formatDate(news.publishedAt)}</span>
+                <span className="font-bold">{news.author}</span>
+                <span className="font-bold">
+                  {formatDate(news.publishedAt)}
+                </span>
               </div>
             </div>
           </div>
