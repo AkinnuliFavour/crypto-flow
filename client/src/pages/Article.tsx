@@ -8,10 +8,10 @@ import {
   Heart,
   Bookmark,
   ExternalLink,
-  Loader2,
 } from "lucide-react";
 import { Layout } from "../components/layout";
 import { NewsCard, Button } from "../components/ui";
+import { ArticleDetailSkeleton } from "../components/ui/Skeletons";
 import { SEO } from "../components/SEO";
 import { StructuredData } from "../components/StructuredData";
 import { createArticleSchema } from "../lib/schemas";
@@ -64,38 +64,7 @@ export const Article: React.FC = () => {
           description="Loading cryptocurrency news article..."
         />
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <div className="mb-6">
-            <Button variant="ghost" asChild className="mb-4">
-              <Link to="/news">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to News
-              </Link>
-            </Button>
-          </div>
-
-          {/* Loading Spinner */}
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-            <p className="text-lg font-medium text-muted-foreground">
-              Loading article...
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              Please wait while we fetch the content
-            </p>
-          </div>
-
-          {/* Skeleton Loader */}
-          <div className="animate-pulse mt-8">
-            <div className="h-8 bg-muted rounded mb-4 w-3/4"></div>
-            <div className="h-4 bg-muted rounded mb-2 w-1/2"></div>
-            <div className="h-4 bg-muted rounded mb-8 w-1/4"></div>
-            <div className="h-64 bg-muted rounded mb-8"></div>
-            <div className="space-y-4">
-              <div className="h-4 bg-muted rounded"></div>
-              <div className="h-4 bg-muted rounded w-5/6"></div>
-              <div className="h-4 bg-muted rounded w-4/6"></div>
-            </div>
-          </div>
+          <ArticleDetailSkeleton />
         </div>
       </Layout>
     );
