@@ -11,6 +11,7 @@ import {
   AddToPortfolio,
   SettingsPanel,
   ImportExport,
+  Modal,
 } from "../components/ui";
 import {
   PieChart,
@@ -332,28 +333,39 @@ export const Dashboard: React.FC = () => {
             </p>
           </div>
           <button
-            onClick={() => setShowSettings(!showSettings)}
+            onClick={() => setShowSettings(true)}
             className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-accent transition-colors whitespace-nowrap flex-shrink-0 self-center sm:self-start"
           >
             <SettingsIcon size={20} />
-            {showSettings ? "Hide" : "Show"} Settings
+            Settings
           </button>
         </div>
 
-        {/* Settings and Import/Export Section */}
-        {showSettings && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <SettingsPanel
-              preferences={preferences}
-              onUpdate={setPreferences}
-            />
-            <ImportExport
-              portfolioData={portfolio}
-              watchlistData={watchlist}
-              onImport={handleImport}
-            />
+        {/* Settings Modal */}
+        <Modal
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+          title="Dashboard Settings"
+          maxWidth="4xl"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Preferences</h3>
+              <SettingsPanel
+                preferences={preferences}
+                onUpdate={setPreferences}
+              />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Import / Export</h3>
+              <ImportExport
+                portfolioData={portfolio}
+                watchlistData={watchlist}
+                onImport={handleImport}
+              />
+            </div>
           </div>
-        )}
+        </Modal>
 
         {/* Portfolio Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

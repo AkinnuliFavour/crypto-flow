@@ -18,3 +18,4 @@ export { AddToWatchlist } from "./AddToWatchlist";
 export { AddToPortfolio } from "./AddToPortfolio";
 export { SettingsPanel } from "./SettingsPanel";
 export { ImportExport } from "./ImportExport";
+export { Modal } from "./Modal";
