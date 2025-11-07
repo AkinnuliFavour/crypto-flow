@@ -367,6 +367,37 @@ export const Dashboard: React.FC = () => {
           </div>
         </Modal>
 
+        {/* Add to Portfolio Modal */}
+        <Modal
+          isOpen={showAddToPortfolio}
+          onClose={() => setShowAddToPortfolio(false)}
+          title="Add to Portfolio"
+          maxWidth="lg"
+        >
+          <AddToPortfolio
+            onAdd={(item) => {
+              handleAddToPortfolio(item);
+              setShowAddToPortfolio(false);
+            }}
+          />
+        </Modal>
+
+        {/* Add to Watchlist Modal */}
+        <Modal
+          isOpen={showAddToWatchlist}
+          onClose={() => setShowAddToWatchlist(false)}
+          title="Add to Watchlist"
+          maxWidth="lg"
+        >
+          <AddToWatchlist
+            currentWatchlist={liveWatchlist}
+            onAdd={(item) => {
+              handleAddToWatchlist(item);
+              setShowAddToWatchlist(false);
+            }}
+          />
+        </Modal>
+
         {/* Portfolio Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <StatsCard
@@ -470,23 +501,15 @@ export const Dashboard: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Portfolio</h2>
-              {!showAddToPortfolio && (
-                <button
-                  onClick={() => setShowAddToPortfolio(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                  <Plus size={16} />
-                  Add to Portfolio
-                </button>
-              )}
+              <button
+                onClick={() => setShowAddToPortfolio(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                <Plus size={16} />
+                Add to Portfolio
+              </button>
             </div>
 
-            {showAddToPortfolio && (
-              <AddToPortfolio
-                onAdd={handleAddToPortfolio}
-                onToggle={() => setShowAddToPortfolio(!showAddToPortfolio)}
-              />
-            )}
             {portfolioWatchlistLoading ? (
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
@@ -586,24 +609,15 @@ export const Dashboard: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Watchlist</h2>
-              {!showAddToWatchlist && (
-                <button
-                  onClick={() => setShowAddToWatchlist(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                  <Plus size={16} />
-                  Add to Watchlist
-                </button>
-              )}
+              <button
+                onClick={() => setShowAddToWatchlist(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                <Plus size={16} />
+                Add to Watchlist
+              </button>
             </div>
 
-            {showAddToWatchlist && (
-              <AddToWatchlist
-                currentWatchlist={liveWatchlist}
-                onAdd={handleAddToWatchlist}
-                onToggle={() => setShowAddToWatchlist(!showAddToWatchlist)}
-              />
-            )}
             {portfolioWatchlistLoading ? (
               <div className="space-y-4">
                 {[...Array(4)].map((_, i) => (

@@ -1,18 +1,16 @@
 import React, { useState } from "react";
-import { X, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useTopCryptos } from "../../hooks/useCoinGecko";
 import type { CryptoData, WatchlistItem } from "../../types";
 
 interface AddToWatchlistProps {
   currentWatchlist: WatchlistItem[];
   onAdd: (item: WatchlistItem) => void;
-  onToggle?: () => void;
 }
 
 export const AddToWatchlist: React.FC<AddToWatchlistProps> = ({
   currentWatchlist,
   onAdd,
-  onToggle,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -46,22 +44,8 @@ export const AddToWatchlist: React.FC<AddToWatchlistProps> = ({
       })
       .slice(0, 10) || [];
 
-  const handleClose = () => {
-    if (onToggle) {
-      onToggle();
-    }
-    setSearchTerm("");
-  };
-
   return (
-    <div className="rounded-lg border bg-card p-4 mb-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Add to Watchlist</h3>
-        <button onClick={handleClose} className="p-1 hover:bg-accent rounded">
-          <X size={20} />
-        </button>
-      </div>
-
+    <div className="rounded-lg border bg-card p-4">
       <div className="relative mb-4">
         <Search
           className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"

@@ -5,13 +5,9 @@ import type { CryptoData, PortfolioItem } from "../../types";
 
 interface AddToPortfolioProps {
   onAdd: (item: PortfolioItem) => void;
-  onToggle?: () => void;
 }
 
-export const AddToPortfolio: React.FC<AddToPortfolioProps> = ({
-  onAdd,
-  onToggle,
-}) => {
+export const AddToPortfolio: React.FC<AddToPortfolioProps> = ({ onAdd }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCoin, setSelectedCoin] = useState<CryptoData | null>(null);
   const [amount, setAmount] = useState("");
@@ -80,25 +76,8 @@ export const AddToPortfolio: React.FC<AddToPortfolioProps> = ({
       })
       .slice(0, 10) || [];
 
-  const handleClose = () => {
-    if (onToggle) {
-      onToggle();
-    }
-    setSelectedCoin(null);
-    setAmount("");
-    setBuyPrice("");
-    setSearchTerm("");
-  };
-
   return (
-    <div className="rounded-lg border bg-card p-4 mb-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Add to Portfolio</h3>
-        <button onClick={handleClose} className="p-1 hover:bg-accent rounded">
-          <X size={20} />
-        </button>
-      </div>
-
+    <div className="rounded-lg border bg-card p-4">
       {!selectedCoin ? (
         <>
           <div className="relative mb-4">
