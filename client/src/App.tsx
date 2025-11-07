@@ -4,6 +4,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HelmetProvider } from "react-helmet-async";
 import { queryClient } from "./lib/queryClient";
 import ErrorBoundary from "./components/ErrorBoundary";
+import ScrollToTop from "./components/ScrollToTop";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { Home } from "./pages/Home";
 import { News } from "./pages/News";
@@ -37,6 +38,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
             <Router>
+              <ScrollToTop />
               <div className="App">
                 <Routes>
                   <Route path="/" element={<Home />} />
