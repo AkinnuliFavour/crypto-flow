@@ -1,12 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  TrendingUp,
-  DollarSign,
-  BarChart3,
-  Users,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { HiTrendingUp } from "react-icons/hi";
+import { FaDollarSign, FaChartBar, FaUsers } from "react-icons/fa";
 import { Layout } from "../components/layout";
 import { NewsCard, PriceTicker, StatsCard, Button } from "../components/ui";
 import {
@@ -157,22 +153,22 @@ export const Home: React.FC = () => {
               <StatsCard
                 title="Total Market Cap"
                 value={marketStats.totalMarketCap}
-                icon={DollarSign}
+                icon={FaDollarSign}
               />
               <StatsCard
                 title="24h Volume"
                 value={marketStats.totalVolume24h}
-                icon={BarChart3}
+                icon={FaChartBar}
               />
               <StatsCard
                 title="BTC Dominance"
                 value={`${marketStats.btcDominance.toFixed(1)}%`}
-                icon={TrendingUp}
+                icon={HiTrendingUp}
               />
               <StatsCard
                 title="Active Cryptos"
                 value={marketStats.activeCryptocurrencies}
-                icon={Users}
+                icon={FaUsers}
               />
             </div>
           ) : (

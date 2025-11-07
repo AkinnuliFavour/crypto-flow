@@ -1,5 +1,5 @@
 import React from "react";
-import type { LucideIcon } from "lucide-react";
+import type { IconType } from "react-icons";
 import { cn } from "../../lib/utils";
 
 interface StatsCardProps {
@@ -9,7 +9,7 @@ interface StatsCardProps {
     value: number;
     label: string;
   };
-  icon?: LucideIcon;
+  icon?: IconType;
   className?: string;
 }
 

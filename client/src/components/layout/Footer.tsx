@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { TrendingUp, Twitter, Github, Mail } from "lucide-react";
+import { FaTwitter, FaGithub, FaEnvelope } from "react-icons/fa";
+import { HiTrendingUp } from "react-icons/hi";
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -12,7 +13,7 @@ export const Footer: React.FC = () => {
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
-              <TrendingUp className="h-6 w-6 text-primary" />
+              <HiTrendingUp className="h-6 w-6 text-primary" />
               <span className="text-lg font-bold">CryptoFlow</span>
             </Link>
             <p className="text-sm text-muted-foreground">
@@ -25,21 +26,21 @@ export const Footer: React.FC = () => {
                 className="text-muted-foreground hover:text-primary transition-colors"
                 aria-label="Twitter"
               >
-                <Twitter className="h-5 w-5" />
+                <FaTwitter className="h-5 w-5" />
               </a>
               <a
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 aria-label="GitHub"
               >
-                <Github className="h-5 w-5" />
+                <FaGithub className="h-5 w-5" />
               </a>
               <a
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors"
                 aria-label="Email"
               >
-                <Mail className="h-5 w-5" />
+                <FaEnvelope className="h-5 w-5" />
               </a>
             </div>
           </div>
