@@ -44,74 +44,77 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/news"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  News
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/dashboard"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Dashboard
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Quick Links & Categories - Side by side on mobile */}
+          <div className="flex gap-8 md:contents">
+            {/* Quick Links */}
+            <div className="space-y-4 flex-1">
+              <h3 className="text-sm font-semibold">Quick Links</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    to="/"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/news"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    News
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/dashboard"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-          {/* Categories */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold">Categories</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/news?category=bitcoin"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Bitcoin
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/news?category=defi"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  DeFi & NFTs
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/news?category=technology"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Technology
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/news?category=regulation"
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Regulation
-                </Link>
-              </li>
-            </ul>
+            {/* Categories */}
+            <div className="space-y-4 flex-1">
+              <h3 className="text-sm font-semibold">Categories</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link
+                    to="/news?category=bitcoin"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Bitcoin
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/news?category=defi"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    DeFi & NFTs
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/news?category=technology"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Technology
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/news?category=regulation"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Regulation
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
 
           {/* Newsletter */}

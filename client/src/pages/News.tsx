@@ -260,14 +260,6 @@ export const News: React.FC = () => {
           categories={categories}
         />
 
-        {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-muted-foreground">
-            Showing {sortedArticles.length} of {totalResults} articles
-            {isSearching && searchTerm && ` for "${searchTerm}"`}
-          </p>
-        </div>
-
         {/* News Grid */}
         {sortedArticles.length > 0 ? (
           <>
@@ -277,13 +269,24 @@ export const News: React.FC = () => {
               ))}
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
+            {/* Results Count and Pagination */}
+            {totalPages > 1 ? (
+              <div className="space-y-4">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+                <p className="text-center text-sm text-muted-foreground">
+                  Showing {sortedArticles.length} of {totalResults} articles
+                  {isSearching && searchTerm && ` for "${searchTerm}"`}
+                </p>
+              </div>
+            ) : (
+              <p className="text-center text-sm text-muted-foreground mt-8">
+                Showing {sortedArticles.length} of {totalResults} articles
+                {isSearching && searchTerm && ` for "${searchTerm}"`}
+              </p>
             )}
           </>
         ) : (
