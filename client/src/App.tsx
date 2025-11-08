@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HelmetProvider } from "react-helmet-async";
+import { Analytics } from "@vercel/analytics/react";
 import { queryClient } from "./lib/queryClient";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
@@ -67,6 +68,7 @@ function App() {
                   />
                 </Routes>
               </div>
+              <Analytics />
             </Router>
           </ThemeProvider>
           <ReactQueryDevtools initialIsOpen={false} />
